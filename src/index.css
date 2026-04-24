@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Material 3 Reference Palette (Blue) */
+  --color-primary: #1a73e8; /* Google Blue */
+  --color-on-primary: #ffffff;
+  --color-primary-container: #d3e3fd;
+  --color-on-primary-container: #041e49;
+  
+  --color-secondary: #5f6368;
+  --color-secondary-container: #f1f3f4;
+  --color-on-secondary-container: #3c4043;
+  
+  --color-surface: #ffffff;
+  --color-surface-variant: #f8f9fa;
+  --color-outline: #dadce0;
+  --color-outline-variant: #e8eaed;
+}
+
+@layer utilities {
+  .google-card {
+    @apply bg-white border border-outline rounded-[24px] transition-all;
+  }
+  .google-shadow {
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15);
+  }
+  .google-shadow-hover {
+    box-shadow: 0 4px 4px 0 rgba(60, 64, 67, .3), 0 8px 12px 6px rgba(60, 64, 67, .15);
+  }
+}
+
+body {
+  @apply bg-surface-variant text-on-secondary-container;
+  font-family: var(--font-sans);
+}
+
+.code-editor {
+  font-family: var(--font-mono);
+}
+
+/* CodeKit 图标样式 */
+.codekit-icon {
+  transition: transform 0.2s ease;
+}
+
+.codekit-icon:hover {
+  transform: scale(1.1);
+}
