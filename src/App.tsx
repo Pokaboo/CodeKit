@@ -25,7 +25,8 @@ import {
   Image,
   Languages,
   Binary,
-  UploadCloud
+  UploadCloud,
+  Github
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Toaster, toast } from 'react-hot-toast';
@@ -344,6 +345,16 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-2">
+          <a
+            href="https://github.com/Pokaboo/CodeKit"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#24292f] hover:bg-[#1a1f24] text-white rounded-full transition-all duration-200 hover:google-shadow group"
+            title="查看 GitHub 仓库"
+          >
+            <Github className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
+            <span className="text-[11px] font-bold tracking-wide hidden sm:inline">GitHub</span>
+          </a>
           <div className="px-3 py-1 bg-primary text-white rounded-full text-[10px] font-bold google-shadow">PREMIUM TOOLSET</div>
           <button className="p-2 rounded-full hover:bg-surface-variant transition-all">
             <Settings className="w-4 h-4 text-secondary" />
@@ -559,11 +570,12 @@ export default function App() {
                         <p className={cn('font-semibold text-sm', activeSubTool === tool.id ? tool.text : 'text-secondary')}>{tool.label}</p>
                         <p className="text-xs text-secondary/60 mt-0.5">{tool.desc}</p>
                       </div>
-                      {activeSubTool === tool.id && (
-                        <div className="ml-auto">
-                          <CheckCircle2 className={cn('w-5 h-5', tool.text)} />
-                        </div>
-                      )}
+                      <div className="ml-auto shrink-0">
+                        <CheckCircle2 className={cn(
+                          'w-5 h-5 transition-opacity duration-200',
+                          activeSubTool === tool.id ? `opacity-100 ${tool.text}` : 'opacity-0'
+                        )} />
+                      </div>
                     </button>
                   ))}
                 </div>
