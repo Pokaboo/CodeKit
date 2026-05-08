@@ -17,12 +17,21 @@ import {
   FileJson,
   Braces,
   Construction,
-  Sparkles
+  Sparkles,
+  ShieldCheck,
+  Lock,
+  Unlock,
+  Hash,
+  Image,
+  Languages,
+  Binary,
+  UploadCloud
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Toaster, toast } from 'react-hot-toast';
 import { XMLParser, XMLBuilder } from 'fast-xml-parser';
 import { format as sqlFormat } from 'sql-formatter';
+import md5 from 'md5';
 import { cn } from './lib/utils';
 import { ToolCategory, SubTool, JavaConfig } from './types';
 import codekitIcon from './assets/codekit-icon.png';
@@ -32,6 +41,9 @@ export default function App() {
   const [activeSubTool, setActiveSubTool] = useState<SubTool>('TRANSFORM');
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
+  // NOTE: 图片转Base64 专用状态，存储图片 data URL 用于预览和输出
+  const [imageDataUrl, setImageDataUrl] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
   const [javaConfig, setJavaConfig] = useState<JavaConfig>({
     useLombok: true,
     getterSetter: false,
@@ -97,6 +109,65 @@ export default function App() {
           setOutput('// SQL 处理中...\n' + input);
           toast.success('SQL 处理完成');
         }
+      } else if (activeCategory === 'CRYPTO') {
+        if (activeSubTool === 'MD5') {
+          // NOTE: MD5 是单向不可逆哈希，仅支持加密
+          setOutput(md5(input));
+          toast.success('MD5 加密完成');
+        } else if (activeSubTool === 'BASE64_ENCODE') {
+          setOutput(btoa(unescape(encodeURIComponent(input))));
+          toast.success('Base64 编码完成');
+        } else if (activeSubTool === 'BASE64_DECODE') {
+          try {
+            setOutput(decodeURIComponent(escape(atob(input.trim()))));
+            toast.success('Base64 解码完成');
+          } catch {
+            toast.error('Base64 解码失败，请检查输入是否合法');
+            return;
+          }
+        } else if (activeSubTool === 'UTF8_TO_GBK') {
+          // NOTE: 使用 Blob + FileReader 将文本编码为 GBK 字节，再以 ISO-8859-1 读出进行逐字节 hex 拼接
+          // 浏览器在创建 Blob 时会根据 charset hint 进行编码转换（Chromium 系支持）
+          const blob = new Blob([input], { type: 'text/plain;charset=gbk' });
+          const fr = new FileReader();
+          fr.onload = () => {
+            const buf = fr.result as ArrayBuffer;
+            const bytes = new Uint8Array(buf);
+            const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0').toUpperCase()).join(' ');
+            setOutput(`GBK Hex:\n${hex}\n\n字节数: ${bytes.length}`);
+            toast.success('UTF-8 → GBK 编码完成');
+          };
+          fr.readAsArrayBuffer(blob);
+          return;
+        } else if (activeSubTool === 'GBK_TO_UTF8') {
+          // NOTE: 将空格分隔的 GBK hex 字节序列解码为 UTF-8 文本
+          try {
+            const hexParts = input.trim().split(/[\s,]+/).filter(Boolean);
+            const bytes = new Uint8Array(hexParts.map(h => parseInt(h, 16)));
+            const decoded = new TextDecoder('gbk').decode(bytes);
+            setOutput(decoded);
+            toast.success('GBK → UTF-8 解码完成');
+          } catch {
+            toast.error('GBK 解码失败，请检查 Hex 格式（例: D6 D0 CE C4）');
+            return;
+          }
+        } else if (activeSubTool === 'ASCII_ENCODE') {
+          // NOTE: 将文本转换为十进制 ASCII 码，非 ASCII 字符输出 Unicode 码点
+          const codes = Array.from(input).map(ch => ch.codePointAt(0)!).join(' ');
+          setOutput(codes);
+          toast.success('ASCII 编码完成');
+        } else if (activeSubTool === 'ASCII_DECODE') {
+          try {
+            const codes = input.trim().split(/\s+/).map(Number);
+            if (codes.some(isNaN)) throw new Error('包含非法字符');
+            setOutput(String.fromCodePoint(...codes));
+            toast.success('ASCII 解码完成');
+          } catch {
+            toast.error('ASCII 解码失败，请输入空格分隔的十进制数字');
+            return;
+          }
+        }
+        return;
       }
     } catch (e) {
       toast.error(`${activeCategory} 格式解析失败，请检查输入`);
@@ -198,6 +269,27 @@ export default function App() {
             </div>
           </div>
         );
+      case 'MD5':
+        return (
+          <div className="p-4 bg-violet-50 rounded-2xl border-2 border-violet-100 text-sm text-violet-800 flex gap-2">
+            <Hash className="w-4 h-4 shrink-0 mt-0.5" />
+            <p>MD5 为单向不可逆哈希算法，输出固定 32 位十六进制字符串，常用于数据校验与密码存储摘要。</p>
+          </div>
+        );
+      case 'BASE64_ENCODE':
+        return (
+          <div className="p-4 bg-sky-50 rounded-2xl border-2 border-sky-100 text-sm text-sky-800 flex gap-2">
+            <Lock className="w-4 h-4 shrink-0 mt-0.5" />
+            <p>将任意文本（含中文）编码为标准 Base64 字符串，支持 UTF-8 全字符集。</p>
+          </div>
+        );
+      case 'BASE64_DECODE':
+        return (
+          <div className="p-4 bg-emerald-50 rounded-2xl border-2 border-emerald-100 text-sm text-emerald-800 flex gap-2">
+            <Unlock className="w-4 h-4 shrink-0 mt-0.5" />
+            <p>将 Base64 字符串还原为原始文本，自动处理 UTF-8 编码，解码失败时将提示错误。</p>
+          </div>
+        );
       default:
         return (
           <div className="p-8 text-center text-outline/40">
@@ -228,12 +320,15 @@ export default function App() {
           <div className="h-4 w-px bg-outline mx-2" />
 
           <nav className="flex items-center bg-surface-variant rounded-full px-1 py-1 gap-1">
-            {(['JSON', 'XML', 'SQL', 'OTHER'] as ToolCategory[]).map((cat) => (
+            {(['JSON', 'XML', 'SQL', 'CRYPTO', 'OTHER'] as ToolCategory[]).map((cat) => (
               <button
                 key={cat}
                 onClick={() => {
                   setActiveCategory(cat);
+                  setInput('');
                   setOutput('');
+                  // NOTE: CRYPTO 分类默认进入 MD5 工具
+                  if (cat === 'CRYPTO') setActiveSubTool('MD5');
                 }}
                 className={cn(
                   "px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200",
@@ -258,7 +353,7 @@ export default function App() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Navigation Sidebar */}
-        {activeCategory !== 'OTHER' && (
+        {activeCategory !== 'OTHER' && activeCategory !== 'CRYPTO' && (
           <aside className="bg-surface-variant w-20 hidden lg:flex flex-col py-6 gap-6 shrink-0 border-r border-outline items-center">
             {(activeCategory === 'JSON' ? [
               { id: 'FORMAT', label: '美化', icon: <AlignLeft className="w-6 h-6" /> },
@@ -336,6 +431,294 @@ export default function App() {
                   <div className="px-6 py-3 bg-white border border-outline text-secondary rounded-full font-bold text-sm google-shadow">MOCK SERVER</div>
                 </div>
               </motion.div>
+            ) : activeCategory === 'CRYPTO' ? (
+              <motion.div
+                key="crypto-panel"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-6 max-w-[1200px] mx-auto"
+              >
+                {/* 页面标题 */}
+                <section className="flex items-end justify-between px-2">
+                  <div className="space-y-1">
+                    <h1 className="text-2xl font-semibold text-secondary flex items-center gap-2">
+                      <ShieldCheck className="w-6 h-6 text-violet-500" />
+                      加解密 &amp; 编码工具
+                    </h1>
+                    <p className="text-sm text-secondary/70">MD5 哈希加密、Base64 编解码，全量本地运算，数据安全有保障。</p>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs font-medium text-secondary/60">
+                    <Lock className="w-3 h-3" />
+                    <span>LOCAL_CRYPTO: ACTIVE</span>
+                  </div>
+                </section>
+
+                {/* 工具卡片选择区 */}
+                <div className="flex flex-wrap gap-4 px-1">
+                  {[
+                    {
+                      id: 'MD5' as SubTool,
+                      label: 'MD5 加密',
+                      desc: '单向不可逆哈希，输出 32 位摘要',
+                      icon: <Hash className="w-6 h-6" />,
+                      color: 'from-violet-500 to-purple-600',
+                      bg: 'bg-violet-50',
+                      border: 'border-violet-200',
+                      text: 'text-violet-700',
+                    },
+                    {
+                      id: 'BASE64_ENCODE' as SubTool,
+                      label: 'Base64 编码',
+                      desc: '文本 → Base64 字符串，支持中文',
+                      icon: <Lock className="w-6 h-6" />,
+                      color: 'from-sky-500 to-blue-600',
+                      bg: 'bg-sky-50',
+                      border: 'border-sky-200',
+                      text: 'text-sky-700',
+                    },
+                    {
+                      id: 'BASE64_DECODE' as SubTool,
+                      label: 'Base64 解码',
+                      desc: 'Base64 字符串 → 原始文本',
+                      icon: <Unlock className="w-6 h-6" />,
+                      color: 'from-emerald-500 to-teal-600',
+                      bg: 'bg-emerald-50',
+                      border: 'border-emerald-200',
+                      text: 'text-emerald-700',
+                    },
+                    {
+                      id: 'IMG_TO_BASE64' as SubTool,
+                      label: '图片转 Base64',
+                      desc: '上传图片，输出 Base64 Data URL',
+                      icon: <Image className="w-6 h-6" />,
+                      color: 'from-pink-500 to-rose-600',
+                      bg: 'bg-pink-50',
+                      border: 'border-pink-200',
+                      text: 'text-pink-700',
+                    },
+                    {
+                      id: 'UTF8_TO_GBK' as SubTool,
+                      label: 'UTF-8 → GBK',
+                      desc: '文本编码为 GBK 字节（Hex）',
+                      icon: <Languages className="w-6 h-6" />,
+                      color: 'from-amber-500 to-orange-600',
+                      bg: 'bg-amber-50',
+                      border: 'border-amber-200',
+                      text: 'text-amber-700',
+                    },
+                    {
+                      id: 'GBK_TO_UTF8' as SubTool,
+                      label: 'GBK → UTF-8',
+                      desc: 'GBK Hex 字节序列解码为文本',
+                      icon: <Languages className="w-6 h-6" />,
+                      color: 'from-orange-500 to-red-500',
+                      bg: 'bg-orange-50',
+                      border: 'border-orange-200',
+                      text: 'text-orange-700',
+                    },
+                    {
+                      id: 'ASCII_ENCODE' as SubTool,
+                      label: 'ASCII 编码',
+                      desc: '文本 → 十进制 ASCII / Unicode 码点',
+                      icon: <Binary className="w-6 h-6" />,
+                      color: 'from-indigo-500 to-blue-700',
+                      bg: 'bg-indigo-50',
+                      border: 'border-indigo-200',
+                      text: 'text-indigo-700',
+                    },
+                    {
+                      id: 'ASCII_DECODE' as SubTool,
+                      label: 'ASCII 解码',
+                      desc: '十进制码点序列 → 原始文本',
+                      icon: <Binary className="w-6 h-6" />,
+                      color: 'from-cyan-500 to-indigo-600',
+                      bg: 'bg-cyan-50',
+                      border: 'border-cyan-200',
+                      text: 'text-cyan-700',
+                    },
+                  ].map((tool) => (
+                    <button
+                      key={tool.id}
+                      onClick={() => { setActiveSubTool(tool.id); setInput(''); setOutput(''); setImageDataUrl(''); }}
+                      className={cn(
+                        'flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200 text-left flex-1 min-w-[220px]',
+                        activeSubTool === tool.id
+                          ? `${tool.bg} ${tool.border} google-shadow`
+                          : 'bg-white border-outline hover:border-outline/60 hover:google-shadow'
+                      )}
+                    >
+                      <div className={cn(
+                        'w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 bg-gradient-to-br text-white',
+                        tool.color
+                      )}>
+                        {tool.icon}
+                      </div>
+                      <div>
+                        <p className={cn('font-semibold text-sm', activeSubTool === tool.id ? tool.text : 'text-secondary')}>{tool.label}</p>
+                        <p className="text-xs text-secondary/60 mt-0.5">{tool.desc}</p>
+                      </div>
+                      {activeSubTool === tool.id && (
+                        <div className="ml-auto">
+                          <CheckCircle2 className={cn('w-5 h-5', tool.text)} />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                {/* 输入 / 输出双栏 */}
+                <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-6 min-h-[420px]">
+                  {/* 输入 Panel */}
+                  <div className="google-card p-4 flex flex-col gap-4">
+                    <div className="flex items-center justify-between border-b border-outline pb-3">
+                      <div className="flex items-center gap-2">
+                        <FileCode2 className="w-4 h-4 text-primary" />
+                        <h2 className="font-semibold text-sm">输入数据</h2>
+                      </div>
+                      <button
+                        onClick={() => { setInput(''); setImageDataUrl(''); setOutput(''); }}
+                        className="text-[10px] font-bold text-secondary uppercase hover:text-red-500 transition-colors"
+                      >Clear</button>
+                    </div>
+
+                    {/* 图片上传区 - 仅 IMG_TO_BASE64 时显示 */}
+                    {activeSubTool === 'IMG_TO_BASE64' ? (
+                      <div className="flex-1 flex flex-col gap-3">
+                        <label
+                          htmlFor="crypto-img-upload"
+                          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                          onDragLeave={() => setIsDragging(false)}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            setIsDragging(false);
+                            const file = e.dataTransfer.files[0];
+                            if (!file || !file.type.startsWith('image/')) {
+                              toast.error('请拖入有效的图片文件');
+                              return;
+                            }
+                            const reader = new FileReader();
+                            reader.onload = (ev) => {
+                              const dataUrl = ev.target?.result as string;
+                              setImageDataUrl(dataUrl);
+                              setOutput(dataUrl);
+                              toast.success('图片已转换为 Base64');
+                            };
+                            reader.readAsDataURL(file);
+                          }}
+                          className={cn(
+                            'flex-1 flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed cursor-pointer transition-all duration-200',
+                            isDragging
+                              ? 'border-primary bg-primary/5 scale-[1.01]'
+                              : 'border-outline hover:border-primary/50 hover:bg-surface-variant/50'
+                          )}
+                        >
+                          {imageDataUrl ? (
+                            <img src={imageDataUrl} alt="预览" className="max-h-48 max-w-full rounded-lg object-contain" />
+                          ) : (
+                            <>
+                              <UploadCloud className="w-10 h-10 text-secondary/40" />
+                              <div className="text-center">
+                                <p className="text-sm font-medium text-secondary">拖放图片或点击选择</p>
+                                <p className="text-xs text-secondary/50 mt-1">支持 PNG / JPG / GIF / WebP / SVG</p>
+                              </div>
+                            </>
+                          )}
+                          <input
+                            id="crypto-img-upload"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              const reader = new FileReader();
+                              reader.onload = (ev) => {
+                                const dataUrl = ev.target?.result as string;
+                                setImageDataUrl(dataUrl);
+                                setOutput(dataUrl);
+                                toast.success('图片已转换为 Base64');
+                              };
+                              reader.readAsDataURL(file);
+                            }}
+                          />
+                        </label>
+                        {imageDataUrl && (
+                          <p className="text-[10px] text-secondary/60 font-mono text-center">
+                            Base64 长度: {output.length.toLocaleString()} 字符
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      // 普通文本输入区
+                      <div className="flex-1 rounded-xl bg-surface-variant border border-outline focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 transition-all overflow-hidden flex flex-col">
+                        <textarea
+                          value={input}
+                          onChange={(e) => setInput(e.target.value)}
+                          className="flex-1 p-4 font-mono text-sm focus:outline-none resize-none bg-transparent placeholder:text-secondary/30"
+                          placeholder={
+                            activeSubTool === 'MD5' ? '请输入需要加密的文本...' :
+                            activeSubTool === 'BASE64_ENCODE' ? '请输入需要编码的原始文本（支持中文）...' :
+                            activeSubTool === 'BASE64_DECODE' ? '请输入需要解码的 Base64 字符串...' :
+                            activeSubTool === 'UTF8_TO_GBK' ? '请输入中文文本，将输出 GBK Hex 字节序列...' :
+                            activeSubTool === 'GBK_TO_UTF8' ? '请输入 GBK Hex 字节（空格分隔，例: D6 D0 CE C4）...' :
+                            activeSubTool === 'ASCII_ENCODE' ? '请输入文本，将转为十进制码点序列...' :
+                            '请输入空格分隔的十进制码点（例: 72 101 108 108 111）...'
+                          }
+                        />
+                      </div>
+                    )}
+
+                    {activeSubTool !== 'IMG_TO_BASE64' && (
+                      <button
+                        onClick={handleProcess}
+                        className="w-full bg-primary text-white py-3 rounded-full font-semibold flex items-center justify-center gap-2 active:scale-98 transition-all hover:google-shadow focus:ring-4 focus:ring-primary/30"
+                      >
+                        <Bolt className="w-4 h-4 fill-current" />
+                        <span>立即执行</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* 输出 Panel */}
+                  <div className="google-card p-4 flex flex-col gap-4">
+                    <div className="flex items-center justify-between border-b border-outline pb-3">
+                      <div className="flex items-center gap-2">
+                        <Code2 className="w-4 h-4 text-emerald-600" />
+                        <h2 className="font-semibold text-sm">处理结果</h2>
+                      </div>
+                      <button
+                        onClick={() => copyToClipboard(output)}
+                        className="text-primary hover:bg-primary-container px-3 py-1 rounded-full text-[11px] font-semibold transition-all flex items-center gap-1.5"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                        COPY
+                      </button>
+                    </div>
+                    <div className="flex-1 rounded-xl bg-[#1e1e1e] border border-outline overflow-hidden flex flex-col google-shadow">
+                      <div className="bg-[#2d2d2d] px-4 py-2 border-b border-[#3e3e3e] flex justify-between items-center">
+                        <span className="text-[#9cdcfe] text-[10px] font-mono font-medium">
+                          {activeSubTool === 'MD5' ? 'output.md5' :
+                           activeSubTool === 'IMG_TO_BASE64' ? 'output.dataurl' :
+                           activeSubTool === 'UTF8_TO_GBK' || activeSubTool === 'GBK_TO_UTF8' ? 'output.txt' :
+                           activeSubTool === 'ASCII_ENCODE' || activeSubTool === 'ASCII_DECODE' ? 'output.ascii' :
+                           'output.txt'}
+                        </span>
+                      </div>
+                      {/* 图片预览：IMG_TO_BASE64 且有输出时，额外展示缩略图 */}
+                      {activeSubTool === 'IMG_TO_BASE64' && imageDataUrl && (
+                        <div className="border-b border-[#3e3e3e] p-4 flex justify-center bg-[#252525]">
+                          <img src={imageDataUrl} alt="Base64预览" className="max-h-32 rounded-lg object-contain" />
+                        </div>
+                      )}
+                      <pre className="flex-1 p-5 font-mono text-xs text-[#d4d4d4] overflow-auto leading-relaxed selection:bg-primary/40 whitespace-pre-wrap break-all">
+                        {output || '// 处理结果将在此呈现...'}
+                      </pre>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
             ) : (
               <motion.div
                 key={`${activeCategory}-${activeSubTool}`}
@@ -368,7 +751,7 @@ export default function App() {
                   </div>
                 </section>
 
-                <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px_1fr] gap-6 min-h-[700px]">
+                <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px_minmax(0,1fr)] gap-6 min-h-[700px]">
                   {/* Panel 1: Source */}
                   <div className="google-card p-4 flex flex-col gap-4">
                     <div className="flex items-center justify-between border-b border-outline pb-3">
@@ -460,8 +843,8 @@ export default function App() {
                 </div>
 
                 {/* Features Bento */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
-                  <div className="p-6 google-card flex items-start gap-5 hover:google-shadow-hover translate-y-0 hover:-translate-y-1 transition-all duration-300">
+                <div className="flex flex-wrap gap-6 pt-6">
+                  <div className="p-6 google-card flex items-start gap-5 hover:google-shadow-hover translate-y-0 hover:-translate-y-1 transition-all duration-300 flex-1 min-w-[260px] max-w-full">
                     <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shrink-0">
                       <Bolt className="w-6 h-6" />
                     </div>
@@ -470,7 +853,7 @@ export default function App() {
                       <p className="text-xs text-secondary/60 leading-relaxed">基于高阶语法树解析算法，毫秒级响应海量数据处理需求。</p>
                     </div>
                   </div>
-                  <div className="p-6 google-card flex items-start gap-5 hover:google-shadow-hover translate-y-0 hover:-translate-y-1 transition-all duration-300">
+                  <div className="p-6 google-card flex items-start gap-5 hover:google-shadow-hover translate-y-0 hover:-translate-y-1 transition-all duration-300 flex-1 min-w-[260px] max-w-full">
                     <div className="w-12 h-12 bg-primary-container text-primary rounded-2xl flex items-center justify-center shrink-0">
                       <CheckCircle2 className="w-6 h-6" />
                     </div>
@@ -479,7 +862,7 @@ export default function App() {
                       <p className="text-xs text-secondary/60 leading-relaxed">内置深度合法性校验引擎，确保输出结果符合行业标准规范。</p>
                     </div>
                   </div>
-                  <div className="p-6 google-card flex items-start gap-5 hover:google-shadow-hover translate-y-0 hover:-translate-y-1 transition-all duration-300">
+                  <div className="p-6 google-card flex items-start gap-5 hover:google-shadow-hover translate-y-0 hover:-translate-y-1 transition-all duration-300 flex-1 min-w-[260px] max-w-full">
                     <div className="w-12 h-12 bg-surface-variant text-secondary rounded-2xl flex items-center justify-center shrink-0">
                       <Database className="w-6 h-6" />
                     </div>
