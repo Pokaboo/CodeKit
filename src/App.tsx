@@ -328,8 +328,13 @@ export default function App() {
                   setActiveCategory(cat);
                   setInput('');
                   setOutput('');
-                  // NOTE: CRYPTO 分类默认进入 MD5 工具
-                  if (cat === 'CRYPTO') setActiveSubTool('MD5');
+                  // NOTE: CRYPTO 默认进入 MD5；其他分类切换时重置为 FORMAT，
+                  // 避免从 CRYPTO 切回时 activeSubTool 残留为 MD5 等 CRYPTO 专属值
+                  if (cat === 'CRYPTO') {
+                    setActiveSubTool('MD5');
+                  } else {
+                    setActiveSubTool('FORMAT');
+                  }
                 }}
                 className={cn(
                   "px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200",
