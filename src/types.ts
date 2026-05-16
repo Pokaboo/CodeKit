@@ -1,27 +1,10 @@
-export type ToolCategory = 'JSON' | 'XML' | 'SQL' | 'OTHER';
+export type ToolCategory = 'JSON' | 'XML' | 'SQL' | 'CRYPTO' | 'OTHER';
 
-export type JsonSubTool = 'FORMAT' | 'COMPRESS' | 'TO_XML' | 'TO_JAVA';
-export type XmlSubTool = 'FORMAT' | 'COMPRESS' | 'TO_JSON' | 'TO_JAVA';
-export type SqlSubTool = 'FORMAT' | 'COMPRESS' | 'TO_IN';
-
-export type SubTool = JsonSubTool | XmlSubTool | SqlSubTool;
+export type SubTool = 'FORMAT' | 'COMPRESS' | 'VALIDATE' | 'TRANSFORM' | 'SCHEMA' | 'TO_XML' | 'MD5' | 'BASE64_ENCODE' | 'BASE64_DECODE' | 'IMG_TO_BASE64' | 'UTF8_TO_GBK' | 'GBK_TO_UTF8' | 'ASCII_ENCODE' | 'ASCII_DECODE';
 
 export interface JavaConfig {
   useLombok: boolean;
   getterSetter: boolean;
   camelCase: boolean;
   jackson: boolean;
-}
-
-export interface ToolDefinition {
-  id: SubTool;
-  label: string;
-  description: string;
-  icon: string;
-}
-
-export interface CategoryConfig {
-  category: ToolCategory;
-  label: string;
-  tools: ToolDefinition[];
 }
