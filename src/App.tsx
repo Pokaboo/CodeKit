@@ -35,6 +35,7 @@ import { format as sqlFormat } from 'sql-formatter';
 import md5 from 'md5';
 import { cn } from './lib/utils';
 import { ToolCategory, SubTool, JavaConfig } from './types';
+import { highlightCode, getOutputLanguage } from './lib/highlight';
 import codekitIcon from './assets/codekit-icon.png';
 
 export default function App() {
@@ -730,7 +731,13 @@ export default function App() {
                         </div>
                       )}
                       <pre className="flex-1 p-5 font-mono text-xs text-[#d4d4d4] overflow-auto leading-relaxed selection:bg-primary/40 whitespace-pre-wrap break-all">
-                        {output || '// 处理结果将在此呈现...'}
+                        {(() => {
+                          const lang = getOutputLanguage(activeCategory, activeSubTool);
+                          if (lang && output) {
+                            return <code className={`hljs language-${lang}`} dangerouslySetInnerHTML={{ __html: highlightCode(output, lang) }} />;
+                          }
+                          return output || '// 处理结果将在此呈现...';
+                        })()}
                       </pre>
                     </div>
                   </div>
@@ -853,7 +860,13 @@ export default function App() {
                         </span>
                       </div>
                       <pre className="flex-1 p-5 font-mono text-xs text-[#d4d4d4] overflow-auto leading-relaxed selection:bg-primary/40 whitespace-pre">
-                        {output || "// 处理结果将在此呈现..."}
+                        {(() => {
+                          const lang = getOutputLanguage(activeCategory, activeSubTool);
+                          if (lang && output) {
+                            return <code className={`hljs language-${lang}`} dangerouslySetInnerHTML={{ __html: highlightCode(output, lang) }} />;
+                          }
+                          return output || "// 处理结果将在此呈现...";
+                        })()}
                       </pre>
                     </div>
                   </div>
