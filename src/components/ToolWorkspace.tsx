@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { App, Button, Card, Input, Switch, Upload, Typography } from 'antd';
 import { Bolt, Copy, FileCode2, Image as ImageIcon, Lightbulb, UploadCloud, Wrench } from 'lucide-react';
 import type { ToolConfig } from '../types';
 import { toolIcons } from '../config/tools';
 import InfoCard from './InfoCard';
+import { highlightCode } from '../lib/highlight';
 
 interface ToolWorkspaceProps {
   tool: ToolConfig;
@@ -79,6 +80,11 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
   };
 
   const isImageMode = tool.accept === 'image';
+  // 输出语法高亮（依据注册表 outputFile 推断语言）
+  const highlighted = useMemo(
+    () => highlightCode(output, tool.outputFile ?? 'output.txt'),
+    [output, tool],
+  );
   const panelTitle = (icon: React.ReactNode, text: string, color: string) => (
     <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 600 }}>
       <span style={{ display: 'flex', color }}>{icon}</span>
@@ -256,7 +262,11 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
               lineHeight: 1.7,
             }}
           >
-            {output || '// 处理结果将在此呈现...'}
+            {output ? (
+              <span className="hljs" dangerouslySetInnerHTML={{ __html: highlighted }} />
+            ) : (
+              '// 处理结果将在此呈现...'
+            )}
           </Typography.Paragraph>
         </div>
       </Card>
