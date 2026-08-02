@@ -68,48 +68,50 @@ CodeKit/
 ├── package.json                # 项目依赖与脚本
 │
 └── src/
-    ├── main.tsx                # React 应用挂载入口
-    ├── App.tsx                 # 核心应用组件（路由、布局、业务逻辑）
-    ├── index.css               # 全局样式 + Material 3 设计令牌
-    ├── types.ts                # TypeScript 类型定义
+    ├── main.tsx                # 入口：ConfigProvider（主题）+ antd App + 路由
+    ├── App.tsx                 # 纯入口组件
+    ├── index.css               # 全局样式 + 设计令牌
+    ├── theme.ts                # Ant Design 主题令牌（视觉规范）
+    ├── vite-env.d.ts           # Vite 客户端类型声明
+    ├── types.ts                # 工具/分类类型定义
     │
-    ├── assets/                 # 静态资源（图标等）
-    │   └── codekit-icon.png    # 应用图标
+    ├── config/
+    │   └── tools.tsx           # 工具注册表（菜单/路由/页面的唯一数据源）
     │
-    └── lib/
-        └── utils.ts            # 工具函数（cn 类名合并）
+    ├── lib/
+    │   ├── utils.ts            # cn() 类名合并
+    │   └── processors.ts       # 纯函数处理器（json/xml/sql/crypto）
+    │
+    ├── layouts/
+    │   └── MainLayout.tsx      # 后台布局：Sider 菜单 + 顶栏面包屑 + 内容区
+    │
+    ├── components/
+    │   ├── ToolWorkspace.tsx   # 通用三栏工作台（输入/配置/输出）
+    │   └── InfoCard.tsx        # 统一提示卡片
+    │
+    ├── pages/
+    │   ├── ComingSoon.tsx      # 规划中页面
+    │   └── NotFound.tsx        # 404 页面
+    │
+    ├── router/
+    │   └── index.tsx           # HashRouter，由注册表生成路由
+    │
+    └── assets/                 # 静态资源（图标等）
 ```
 
-### 核心模块说明
+### 核心设计：注册表驱动
 
-```
-┌──────────────────────────────────────────────────────┐
-│                     App.tsx                           │
-│                                                      │
-│  ┌─────────────┐  ┌──────────┐  ┌─────────────────┐ │
-│  │   Header    │  │ Sidebar  │  │   Main Content   │ │
-│  │  导航 + 分类 │  │ 子工具栏  │  │  输入 / 配置 / 输出│ │
-│  └─────────────┘  └──────────┘  └─────────────────┘ │
-│                                                      │
-│  ┌─────────────────────────────────────────────────┐ │
-│  │              处理引擎 (handleProcess)             │ │
-│  │  JSON.parse / XMLParser / sqlFormat / POJO生成   │ │
-│  └─────────────────────────────────────────────────┘ │
-│                                                      │
-│  ┌──────────────┐  ┌────────────────────────────┐   │
-│  │ SidebarItem  │  │      ConfigToggle          │   │
-│  │  侧边栏按钮   │  │     配置开关组件             │   │
-│  └──────────────┘  └────────────────────────────┘   │
-└──────────────────────────────────────────────────────┘
-```
+- **工具注册表 `config/tools.tsx`**：分类 → 子工具（图标、占位符、处理器、配置项、提示）全部集中定义
+- **菜单 / 路由 / 面包屑三端联动**：菜单项 key = 路由 path，全部由注册表推导，刷新后 URL 自动恢复选中态
+- **通用工作台 `ToolWorkspace`**：所有文本类工具共用同一三栏布局，新增工具只需在注册表 +1 条
 
 ### 数据流
 
 ```
-用户输入 → 选择工具类型 (Category + SubTool)
-         → 配置参数 (JavaConfig 等)
+用户输入 → 侧边栏选择工具（路由切换）
+         → 配置开关（注册表 options）
          → 点击「立即执行」
-         → handleProcess() 路由到对应处理器
+         → processors 纯函数处理器
          → 输出结果 → 一键复制到剪贴板
 ```
 
@@ -122,13 +124,14 @@ CodeKit/
 | **框架** | React 19 | UI 组件化渲染 |
 | **语言** | TypeScript 5.8 | 类型安全 |
 | **构建** | Vite 6 | 极速 HMR 开发体验 |
-| **样式** | Tailwind CSS 4 | 原子化 CSS + Material 3 设计令牌 |
-| **动画** | Motion (Framer Motion) | 页面切换与交互动效 |
-| **图标** | Lucide React | 轻量 SVG 图标库 |
-| **通知** | React Hot Toast | 操作反馈提示 |
+| **样式** | Tailwind CSS 4 + Ant Design | 原子化样式 + 企业级组件库 |
+| **主题** | antd ConfigProvider | 全局视觉规范（主色 #1677ff） |
+| **路由** | React Router 7 | 菜单/页面一一对应的 Hash 路由 |
+| **图标** | Lucide + @ant-design/icons | 轻量 SVG 图标库 |
+| **反馈** | antd message | 操作提示 |
 | **JSON→XML** | fast-xml-parser | XML 解析与构建 |
 | **SQL 美化** | sql-formatter | SQL 语句标准格式化 |
-| **类名工具** | clsx + tailwind-merge | 条件类名合并 |
+| **哈希** | md5 | MD5 摘要 |
 
 ---
 

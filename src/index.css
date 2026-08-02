@@ -2,51 +2,82 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Outfit", "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
-  /* Material 3 Reference Palette (Blue) */
-  --color-primary: #1a73e8; /* Google Blue */
-  --color-on-primary: #ffffff;
-  --color-primary-container: #d3e3fd;
-  --color-on-primary-container: #041e49;
-  
-  --color-secondary: #5f6368;
-  --color-secondary-container: #f1f3f4;
-  --color-on-secondary-container: #3c4043;
-  
-  --color-surface: #ffffff;
-  --color-surface-variant: #f8f9fa;
-  --color-outline: #dadce0;
-  --color-outline-variant: #e8eaed;
-}
+  /* 简约现代（方案 A）色彩令牌 */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-soft: #eff6ff;
+  --color-accent: #8b5cf6;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
 
-@layer utilities {
-  .google-card {
-    @apply bg-white border border-outline rounded-[24px] transition-all;
-  }
-  .google-shadow {
-    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15);
-  }
-  .google-shadow-hover {
-    box-shadow: 0 4px 4px 0 rgba(60, 64, 67, .3), 0 8px 12px 6px rgba(60, 64, 67, .15);
-  }
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-border: #e2e8f0;
+  --color-nav: #0f172a;
+  --color-text-1: #0f172a;
+  --color-text-2: #475569;
+  --color-text-3: #94a3b8;
 }
 
 body {
-  @apply bg-surface-variant text-on-secondary-container;
+  background: #f8fafc;
+  color: #0f172a;
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
-.code-editor {
+/* Sider 菜单选中项：左侧 3px 白色指示条 */
+.ant-menu-dark .ant-menu-item-selected,
+.ant-menu-dark .ant-menu-submenu-title-selected {
+  position: relative;
+}
+.ant-menu-dark .ant-menu-item-selected::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: #fff;
+}
+
+/* 卡片 hover 反馈（工具工作台主卡片） */
+.ck-rise {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.ck-rise:hover {
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  transform: translateY(-1px);
+}
+
+/* 主按钮 hover 轻微抬升 */
+.ck-btn-rise {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.ck-btn-rise:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+}
+
+/* Sider 滚动修复：antd 中间层 .ant-layout-sider-children 需为 flex 列容器，
+   菜单区 flex:1 + min-height:0 才能独立滚动（logo 与版本号固定） */
+.ck-sider .ant-layout-sider-children {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.ck-sider .ck-sider-menu {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* 代码输出区 */
+.ck-code {
   font-family: var(--font-mono);
-}
-
-/* CodeKit 图标样式 */
-.codekit-icon {
-  transition: transform 0.2s ease;
-}
-
-.codekit-icon:hover {
-  transform: scale(1.1);
 }
