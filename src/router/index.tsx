@@ -3,14 +3,17 @@ import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Tag } from 'antd';
 import type { CategoryConfig, ToolConfig } from '../types';
 import { categories, findCategory } from '../config/tools';
+import { useTheme } from '../theme/ThemeContext';
 import MainLayout from '../layouts/MainLayout';
 import ToolWorkspace from '../components/ToolWorkspace';
 import ComingSoon from '../pages/ComingSoon';
 import NotFound from '../pages/NotFound';
 
-/** 工具页包装：标题区 + 通用工作台。由注册表生成，保证菜单/路由/页面一一对应。 */
+/** 工具页包装：标题区 + 工作台。由注册表生成，保证菜单/路由/页面一一对应。 */
 function ToolPage({ catId, tool }: { catId: string; tool: ToolConfig }) {
   const cat = findCategory(catId);
+  const { preset } = useTheme();
+  const Body = tool.customWorkspace;
   return (
     <div className="space-y-5" style={{ maxWidth: 1280, margin: '0 auto' }}>
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', padding: '0 2px' }}>
@@ -34,9 +37,9 @@ function ToolPage({ catId, tool }: { catId: string; tool: ToolConfig }) {
         <Tag
           style={{
             marginBottom: 4,
-            background: '#eff6ff',
-            borderColor: '#bfdbfe',
-            color: '#2563eb',
+            background: preset.primarySoft,
+            borderColor: preset.primaryBorder,
+            color: preset.primary,
             borderRadius: 6,
             padding: '0 10px',
           }}
@@ -44,7 +47,7 @@ function ToolPage({ catId, tool }: { catId: string; tool: ToolConfig }) {
           本地运行中
         </Tag>
       </div>
-      <ToolWorkspace tool={tool} />
+      {Body ? <Body tool={tool} /> : <ToolWorkspace tool={tool} />}
     </div>
   );
 }

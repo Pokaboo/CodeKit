@@ -5,6 +5,7 @@ import type { ToolConfig } from '../types';
 import { toolIcons } from '../config/tools';
 import InfoCard from './InfoCard';
 import { highlightCode } from '../lib/highlight';
+import { useTheme } from '../theme/ThemeContext';
 
 interface ToolWorkspaceProps {
   tool: ToolConfig;
@@ -25,6 +26,7 @@ const cardBodyStyle = { padding: 20 } as const;
 /** 通用三栏工作台：输入 / 配置 / 输出。所有文本类工具共用。 */
 export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
   const { message } = App.useApp();
+  const { primary } = useTheme();
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
   const [imageDataUrl, setImageDataUrl] = useState('');
@@ -97,7 +99,7 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
       {/* 输入 */}
       <Card
         className="ck-rise lg:order-1 xl:order-1"
-        title={panelTitle(<FileCode2 size={15} />, '输入数据', '#2563eb')}
+        title={panelTitle(<FileCode2 size={15} />, '输入数据', primary)}
         extra={
           <Button
             type="text"
@@ -109,7 +111,7 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
           </Button>
         }
         styles={{ body: cardBodyStyle }}
-        style={{ borderTop: '3px solid #2563eb' }}
+        style={{ borderTop: `3px solid ${primary}` }}
       >
         {isImageMode ? (
           <Upload.Dragger
@@ -154,7 +156,7 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
       {/* 配置 */}
       <Card
         className="lg:order-3 lg:col-span-2 xl:order-2 xl:col-span-1"
-        title={panelTitle(<Wrench size={15} />, '处理配置', '#2563eb')}
+        title={panelTitle(<Wrench size={15} />, '处理配置', primary)}
         styles={{ body: cardBodyStyle }}
       >
         <div className="flex flex-col gap-2 lg:flex-row lg:flex-wrap lg:items-center lg:gap-x-8 lg:gap-y-2">

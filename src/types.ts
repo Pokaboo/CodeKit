@@ -1,5 +1,7 @@
+import type { ComponentType } from 'react';
+
 /** 工具分类（一级菜单） */
-export type CategoryId = 'json' | 'xml' | 'sql' | 'crypto' | 'more';
+export type CategoryId = 'json' | 'xml' | 'sql' | 'crypto' | 'compare' | 'more';
 
 /** 工具选项（配置面板的开关项） */
 export interface ToolOption {
@@ -29,6 +31,8 @@ export interface ToolConfig {
   hint?: { text: string; tone: HintTone };
   /** 输出面板 tab 名 */
   outputFile?: string;
+  /** 自定义工作台组件：用于无法套用通用三栏（单输入→文本输出）模型的工具，如数据对比 */
+  customWorkspace?: ComponentType<{ tool: ToolConfig }>;
 }
 
 /** 分类定义（一级菜单） */

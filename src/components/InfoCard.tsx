@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
 import type { HintTone } from '../types';
+import { useTheme } from '../theme/ThemeContext';
 
-/** 四类语义色（与 antd 色板一致）：info / success / warning / danger */
-const toneStyles: Record<HintTone, { bg: string; border: string; text: string }> = {
-  info: { bg: '#eff6ff', border: '#bfdbfe', text: '#1d4ed8' },
+/** 语义色（与 antd 色板一致）：success / warning / danger 为固定语义色；info 跟随主题主色 */
+const staticTones: Record<Exclude<HintTone, 'info'>, { bg: string; border: string; text: string }> = {
   success: { bg: '#ecfdf5', border: '#a7f3d0', text: '#047857' },
   warning: { bg: '#fffbeb', border: '#fde68a', text: '#b45309' },
   danger: { bg: '#fef2f2', border: '#fecaca', text: '#b91c1c' },
@@ -17,7 +17,11 @@ interface InfoCardProps {
 
 /** 统一提示卡片：注册表中的 hint 由此渲染 */
 export default function InfoCard({ icon, text, tone = 'info' }: InfoCardProps) {
-  const s = toneStyles[tone];
+  const { preset } = useTheme();
+  const s =
+    tone === 'info'
+      ? { bg: preset.infoBg, border: preset.infoBorder, text: preset.infoText }
+      : staticTones[tone];
   return (
     <div
       style={{

@@ -16,8 +16,13 @@ import {
   Image as ImageIcon,
   Languages,
   Binary,
+  GitCompare,
+  Sheet,
+  FileText,
 } from 'lucide-react';
 import type { CategoryConfig } from '../types';
+import ExcelCompareWorkspace from '../components/compare/ExcelCompareWorkspace';
+import TextCompareWorkspace from '../components/compare/TextCompareWorkspace';
 import {
   formatJson,
   compressJson,
@@ -249,6 +254,35 @@ export const categories: CategoryConfig[] = [
     ],
   },
   {
+    id: 'compare',
+    label: '数据对比工具',
+    description: 'Excel 与文本的差异比对，可导出结果',
+    tools: [
+      {
+        key: 'excel',
+        label: 'Excel 对比',
+        description: '上传两份列结构相同的 Excel，按关键列匹配并导出差异',
+        placeholder: '',
+        customWorkspace: ExcelCompareWorkspace,
+        hint: {
+          text: '选择关键列（如 ID）对齐两表，系统逐列比对并生成差异明细，可一键导出 Excel。',
+          tone: 'info',
+        },
+      },
+      {
+        key: 'text',
+        label: '文本对比',
+        description: '粘贴两段文本，输出不一致的行级差异',
+        placeholder: '',
+        customWorkspace: TextCompareWorkspace,
+        hint: {
+          text: '左侧原文、右侧对比文，点击对比后以红/绿标注新增与删除的行。',
+          tone: 'info',
+        },
+      },
+    ],
+  },
+  {
     id: 'more',
     label: '更多规划中',
     description: 'Regex Engine、JWT Debugger、Mock Server 规划中',
@@ -262,6 +296,7 @@ export const categoryIcons: Record<string, ReactNode> = {
   xml: <Braces size={16} />,
   sql: <Database size={16} />,
   crypto: <ShieldCheck size={16} />,
+  compare: <GitCompare size={16} />,
   more: <Wrench size={16} />,
 };
 
@@ -282,6 +317,8 @@ export const toolIcons: Record<string, ReactNode> = {
   'gbk-to-utf8': <Languages size={14} />,
   'ascii-encode': <Binary size={14} />,
   'ascii-decode': <Binary size={14} />,
+  excel: <Sheet size={14} />,
+  text: <FileText size={14} />,
 };
 
 /** 全量工具 key → 所属分类 查找（路由/面包屑用） */

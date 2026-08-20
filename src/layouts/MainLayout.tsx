@@ -4,6 +4,7 @@ import { Breadcrumb, Button, Drawer, Grid, Layout, Menu } from 'antd';
 import { GithubOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { categories, categoryIcons, findTool, toolIcons } from '../config/tools';
 import codekitIcon from '../assets/codekit-icon.png';
+import ThemeSwitcher from '../components/ThemeSwitcher';
 
 const { Sider, Header, Content } = Layout;
 
@@ -152,6 +153,7 @@ export default function MainLayout() {
           />
           <Breadcrumb items={breadcrumbItems} style={{ fontSize: 13 }} />
           <div style={{ flex: 1 }} />
+          <ThemeSwitcher />
           <span style={{ fontSize: 11, color: 'rgba(0,0,0,0.45)' }}>本地运行中</span>
           <Button
             type="text"
