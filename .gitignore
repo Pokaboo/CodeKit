@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# 代理/环境内部数据（记忆、技能缓存、自动化等），不纳入版本控制
+.workbuddy/
