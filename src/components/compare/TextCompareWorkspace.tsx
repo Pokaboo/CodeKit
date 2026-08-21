@@ -3,7 +3,7 @@ import { App, Button, Card, Input, Switch, Tag } from 'antd';
 import { Copy, FileText, Download, GitCompareArrows } from 'lucide-react';
 import { diffLines } from 'diff';
 import { useTheme } from '../../theme/ThemeContext';
-import { PanelTitle, cardBodyStyle } from './parts';
+import { AccentCard, PanelTitle, cardBodyStyle } from './parts';
 
 interface DiffLine {
   key: string;
@@ -89,11 +89,9 @@ export default function TextCompareWorkspace() {
     <div className="space-y-5">
       {/* 输入区 */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <Card
-          className="ck-rise"
-          title={PanelTitle({ icon: <FileText size={15} />, text: '左侧原文', color: primary })}
-          styles={{ body: cardBodyStyle }}
-          style={{ borderTop: `3px solid ${primary}` }}
+        <AccentCard
+          accent={primary}
+          title={PanelTitle({ icon: <FileText size={15} />, text: '左侧原文', color: '#fff' })}
         >
           <Input.TextArea
             value={textA}
@@ -103,12 +101,10 @@ export default function TextCompareWorkspace() {
             className="ck-code"
             style={{ fontSize: 13, background: '#f8fafc', lineHeight: 1.7 }}
           />
-        </Card>
-        <Card
-          className="ck-rise"
-          title={PanelTitle({ icon: <FileText size={15} />, text: '右侧对比文', color: '#10b981' })}
-          styles={{ body: cardBodyStyle }}
-          style={{ borderTop: '3px solid #10b981' }}
+        </AccentCard>
+        <AccentCard
+          accent="#10b981"
+          title={PanelTitle({ icon: <FileText size={15} />, text: '右侧对比文', color: '#fff' })}
         >
           <Input.TextArea
             value={textB}
@@ -118,7 +114,7 @@ export default function TextCompareWorkspace() {
             className="ck-code"
             style={{ fontSize: 13, background: '#f8fafc', lineHeight: 1.7 }}
           />
-        </Card>
+        </AccentCard>
       </div>
 
       {/* 配置 / 操作区 */}
@@ -156,11 +152,9 @@ export default function TextCompareWorkspace() {
       </Card>
 
       {/* 输出区 */}
-      <Card
-        className="ck-rise"
-        title={PanelTitle({ icon: <GitCompareArrows size={15} />, text: '差异结果', color: '#10b981' })}
-        styles={{ body: cardBodyStyle }}
-        style={{ borderTop: '3px solid #10b981' }}
+      <AccentCard
+        accent="#10b981"
+        title={PanelTitle({ icon: <GitCompareArrows size={15} />, text: '差异结果', color: '#fff' })}
       >
         <div
           style={{
@@ -188,7 +182,7 @@ export default function TextCompareWorkspace() {
             </pre>
           )}
         </div>
-      </Card>
+      </AccentCard>
     </div>
   );
 }

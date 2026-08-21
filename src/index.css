@@ -142,7 +142,21 @@ body {
   overflow-y: auto;
 }
 
+/* AccentCard 顶部色条：压缩头部高度，比 antd 默认（约 56px）更纤细。
+   用独立类控制， specificity 高于 .ant-card-head，切换主题也不会被重置。 */
+.ck-accent-card .ant-card-head {
+  min-height: 38px;
+  height: 38px;
+  padding: 0 16px;
+}
+
 /* 代码输出区 */
 .ck-code {
   font-family: var(--font-mono);
+}
+
+/* 实时刷新指示点动画（当前时间戳） */
+@keyframes ck-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
 }

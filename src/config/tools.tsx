@@ -19,10 +19,18 @@ import {
   GitCompare,
   Sheet,
   FileText,
+  Clock,
+  CalendarClock,
+  Calendar,
+  Timer,
 } from 'lucide-react';
 import type { CategoryConfig } from '../types';
 import ExcelCompareWorkspace from '../components/compare/ExcelCompareWorkspace';
 import TextCompareWorkspace from '../components/compare/TextCompareWorkspace';
+import NowWorkspace from '../components/time/NowWorkspace';
+import TsToDateWorkspace from '../components/time/TsToDateWorkspace';
+import DateToTsWorkspace from '../components/time/DateToTsWorkspace';
+import TimeDiffWorkspace from '../components/time/TimeDiffWorkspace';
 import {
   formatJson,
   compressJson,
@@ -283,6 +291,57 @@ export const categories: CategoryConfig[] = [
     ],
   },
   {
+    id: 'time',
+    label: '时间转换工具',
+    description: '时间戳与日期互转、时区切换、时间差与倒计时',
+    tools: [
+      {
+        key: 'now',
+        label: '当前时间戳',
+        description: '实时显示秒级/毫秒级时间戳与常用格式',
+        placeholder: '',
+        customWorkspace: NowWorkspace,
+        hint: {
+          text: '实时刷新当前时间戳（秒级/毫秒级）及多种本地化格式，支持一键复制。',
+          tone: 'info',
+        },
+      },
+      {
+        key: 'ts-to-date',
+        label: '时间戳转日期',
+        description: '时间戳按自定义格式与 UTC/本地时区转为日期',
+        placeholder: '',
+        customWorkspace: TsToDateWorkspace,
+        hint: {
+          text: '输入时间戳，选择单位与 UTC/本地时区，使用 YYYY-MM-DD HH:mm:ss 等自定义格式输出。',
+          tone: 'info',
+        },
+      },
+      {
+        key: 'date-to-ts',
+        label: '日期转时间戳',
+        description: '选择日期时间并输出对应秒级/毫秒级时间戳',
+        placeholder: '',
+        customWorkspace: DateToTsWorkspace,
+        hint: {
+          text: '选择日期时间（可切换本地/UTC 解析），一键得到对应的秒级与毫秒级时间戳。',
+          tone: 'info',
+        },
+      },
+      {
+        key: 'diff',
+        label: '时间差 / 倒计时',
+        description: '计算两时间差值并实时倒计时到目标时间',
+        placeholder: '',
+        customWorkspace: TimeDiffWorkspace,
+        hint: {
+          text: '选择起止时间计算差值（天/时/分/秒），并可实时倒计时到目标时间。',
+          tone: 'info',
+        },
+      },
+    ],
+  },
+  {
     id: 'more',
     label: '更多规划中',
     description: 'Regex Engine、JWT Debugger、Mock Server 规划中',
@@ -297,6 +356,7 @@ export const categoryIcons: Record<string, ReactNode> = {
   sql: <Database size={16} />,
   crypto: <ShieldCheck size={16} />,
   compare: <GitCompare size={16} />,
+  time: <Clock size={16} />,
   more: <Wrench size={16} />,
 };
 
@@ -319,6 +379,10 @@ export const toolIcons: Record<string, ReactNode> = {
   'ascii-decode': <Binary size={14} />,
   excel: <Sheet size={14} />,
   text: <FileText size={14} />,
+  now: <Clock size={14} />,
+  'ts-to-date': <CalendarClock size={14} />,
+  'date-to-ts': <Calendar size={14} />,
+  diff: <Timer size={14} />,
 };
 
 /** 全量工具 key → 所属分类 查找（路由/面包屑用） */

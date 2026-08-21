@@ -4,6 +4,7 @@ import { Bolt, Copy, FileCode2, Image as ImageIcon, Lightbulb, UploadCloud, Wren
 import type { ToolConfig } from '../types';
 import { toolIcons } from '../config/tools';
 import InfoCard from './InfoCard';
+import { AccentCard, PanelTitle, cardBodyStyle } from './compare/parts';
 import { highlightCode } from '../lib/highlight';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -20,8 +21,6 @@ function fileToDataUrl(file: File): Promise<string> {
     reader.readAsDataURL(file);
   });
 }
-
-const cardBodyStyle = { padding: 20 } as const;
 
 /** 通用三栏工作台：输入 / 配置 / 输出。所有文本类工具共用。 */
 export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
@@ -87,31 +86,24 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
     () => highlightCode(output, tool.outputFile ?? 'output.txt'),
     [output, tool],
   );
-  const panelTitle = (icon: React.ReactNode, text: string, color: string) => (
-    <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 600 }}>
-      <span style={{ display: 'flex', color }}>{icon}</span>
-      {text}
-    </span>
-  );
 
   return (
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_260px_minmax(0,1fr)]">
       {/* 输入 */}
-      <Card
-        className="ck-rise lg:order-1 xl:order-1"
-        title={panelTitle(<FileCode2 size={15} />, '输入数据', primary)}
+      <AccentCard
+        className="lg:order-1 xl:order-1"
+        accent={primary}
+        title={PanelTitle({ icon: <FileCode2 size={15} />, text: '输入数据', color: '#fff' })}
         extra={
           <Button
             type="text"
             size="small"
-            danger
+            style={{ color: 'rgba(255,255,255,0.88)' }}
             onClick={() => { setInput(''); setOutput(''); setImageDataUrl(''); }}
           >
             清空
           </Button>
         }
-        styles={{ body: cardBodyStyle }}
-        style={{ borderTop: `3px solid ${primary}` }}
       >
         {isImageMode ? (
           <Upload.Dragger
@@ -151,12 +143,12 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
             Base64 长度: {output.length.toLocaleString()} 字符
           </div>
         )}
-      </Card>
+      </AccentCard>
 
       {/* 配置 */}
       <Card
         className="lg:order-3 lg:col-span-2 xl:order-2 xl:col-span-1"
-        title={panelTitle(<Wrench size={15} />, '处理配置', primary)}
+        title={PanelTitle({ icon: <Wrench size={15} />, text: '处理配置', color: primary })}
         styles={{ body: cardBodyStyle }}
       >
         <div className="flex flex-col gap-2 lg:flex-row lg:flex-wrap lg:items-center lg:gap-x-8 lg:gap-y-2">
@@ -214,16 +206,21 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
       </Card>
 
       {/* 输出 */}
-      <Card
-        className="ck-rise lg:order-2 xl:order-3"
-        title={panelTitle(<FileCode2 size={15} />, '处理结果', '#10b981')}
+      <AccentCard
+        className="lg:order-2 xl:order-3"
+        accent="#10b981"
+        title={PanelTitle({ icon: <FileCode2 size={15} />, text: '处理结果', color: '#fff' })}
         extra={
-          <Button size="small" icon={<Copy size={12} />} onClick={() => void copy()} style={{ fontSize: 12 }}>
+          <Button
+            type="text"
+            size="small"
+            icon={<Copy size={12} />}
+            style={{ color: '#ffffff' }}
+            onClick={() => void copy()}
+          >
             复制
           </Button>
         }
-        styles={{ body: cardBodyStyle }}
-        style={{ borderTop: '3px solid #10b981' }}
       >
         <div style={{ background: '#0f172a', borderRadius: 10, overflow: 'hidden' }}>
           <div
@@ -271,7 +268,7 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
             )}
           </Typography.Paragraph>
         </div>
-      </Card>
+      </AccentCard>
     </div>
   );
 }

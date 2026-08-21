@@ -44,7 +44,7 @@ function ToolPage({ catId, tool }: { catId: string; tool: ToolConfig }) {
             padding: '0 10px',
           }}
         >
-          本地运行中
+          让开发更省心
         </Tag>
       </div>
       {Body ? <Body tool={tool} /> : <ToolWorkspace tool={tool} />}

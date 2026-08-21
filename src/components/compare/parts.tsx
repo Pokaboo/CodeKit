@@ -13,7 +13,9 @@ export function PanelTitle({ icon, text, color }: { icon: ReactNode; text: strin
 
 export const cardBodyStyle = { padding: 20 } as const;
 
-/** 顶部强调色卡片（与 ToolWorkspace 视觉一致） */
+/** 顶部强调色卡片（与 ToolWorkspace 视觉一致）
+ * 设计说明：使用整条纯色 header 横幅（白色 icon + 白色标题），替代早期 borderTop:3px 细条，
+ * 避免彩色细条在白卡顶部"孤立漂浮"。配置类中性卡片请直接用 antd Card，不走此组件。 */
 export function AccentCard({
   accent,
   title,
@@ -29,11 +31,20 @@ export function AccentCard({
 }) {
   return (
     <Card
-      className={`ck-rise ${className ?? ''}`}
+      className={`ck-rise ck-accent-card ${className ?? ''}`}
       title={title}
       extra={extra}
-      styles={{ body: cardBodyStyle }}
-      style={{ borderTop: `3px solid ${accent}` }}
+      styles={{
+        header: {
+          background: accent,
+          color: '#ffffff',
+          borderBottom: 'none',
+          borderTopLeftRadius: 12,
+          borderTopRightRadius: 12,
+        },
+        body: cardBodyStyle,
+      }}
+      style={{ overflow: 'hidden', height: '100%' }}
     >
       {children}
     </Card>

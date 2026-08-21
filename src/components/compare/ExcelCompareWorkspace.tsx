@@ -5,7 +5,7 @@ import { Download, FileSpreadsheet, GitCompareArrows, UploadCloud } from 'lucide
 import * as XLSX from 'xlsx';
 import type { WorkBook } from 'xlsx';
 import { useTheme } from '../../theme/ThemeContext';
-import { PanelTitle, cardBodyStyle } from './parts';
+import { AccentCard, PanelTitle, cardBodyStyle } from './parts';
 import {
   buildExportWorkbook,
   compareWorkbooks,
@@ -165,11 +165,9 @@ export default function ExcelCompareWorkspace() {
   ];
 
   const Uploader = ({ side, file, onFile }: { side: 'A' | 'B'; file: File | null; onFile: (f: File) => void }) => (
-    <Card
-      className="ck-rise"
-      title={PanelTitle({ icon: <FileSpreadsheet size={15} />, text: `文件${side}`, color: primary })}
-      styles={{ body: cardBodyStyle }}
-      style={{ borderTop: `3px solid ${primary}` }}
+    <AccentCard
+      accent={primary}
+      title={PanelTitle({ icon: <FileSpreadsheet size={15} />, text: `文件${side}`, color: '#fff' })}
     >
       <Upload.Dragger
         accept={ACCEPT}
@@ -194,7 +192,7 @@ export default function ExcelCompareWorkspace() {
           </div>
         )}
       </Upload.Dragger>
-    </Card>
+    </AccentCard>
   );
 
   return (
@@ -275,21 +273,24 @@ export default function ExcelCompareWorkspace() {
             <StatCard label="仅B存在" value={result.stats.onlyB} color="#10b981" />
           </div>
 
-          <Card
-            className="ck-rise"
-            title={PanelTitle({ icon: <GitCompareArrows size={15} />, text: '单元格差异', color: '#ef4444' })}
+          <AccentCard
+            accent="#ef4444"
+            title={PanelTitle({ icon: <GitCompareArrows size={15} />, text: '单元格差异', color: '#fff' })}
             extra={
               <Button
-                type="primary"
+                size="small"
                 icon={<Download size={14} />}
                 loading={exporting}
                 onClick={exportExcel}
+                style={{
+                  background: 'rgba(255,255,255,0.18)',
+                  color: '#ffffff',
+                  borderColor: 'rgba(255,255,255,0.35)',
+                }}
               >
                 导出差异 Excel
               </Button>
             }
-            styles={{ body: { padding: 0 } }}
-            style={{ borderTop: '3px solid #ef4444' }}
           >
             <Table
               columns={diffColumns}
@@ -300,14 +301,12 @@ export default function ExcelCompareWorkspace() {
               scroll={{ x: 600 }}
               locale={{ emptyText: '无单元格差异' }}
             />
-          </Card>
+          </AccentCard>
 
           {result.orphans.length > 0 && (
-            <Card
-              className="ck-rise"
-              title={PanelTitle({ icon: <GitCompareArrows size={15} />, text: '独有行（仅存在于某一文件）', color: '#f59e0b' })}
-              styles={{ body: { padding: 0 } }}
-              style={{ borderTop: '3px solid #f59e0b' }}
+            <AccentCard
+              accent="#f59e0b"
+              title={PanelTitle({ icon: <GitCompareArrows size={15} />, text: '独有行（仅存在于某一文件）', color: '#fff' })}
             >
               <Table
                 columns={orphanColumns}
@@ -318,7 +317,7 @@ export default function ExcelCompareWorkspace() {
                 scroll={{ x: 600 }}
                 locale={{ emptyText: '无独有行' }}
               />
-            </Card>
+            </AccentCard>
           )}
         </div>
       )}

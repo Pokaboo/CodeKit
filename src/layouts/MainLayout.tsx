@@ -132,7 +132,7 @@ export default function MainLayout() {
               flexShrink: 0,
             }}
           >
-            {!collapsed && 'v2.0.0-antd'}
+            {!collapsed && 'v2.0.0'}
           </div>
         </Sider>
       )}
@@ -154,7 +154,7 @@ export default function MainLayout() {
           <Breadcrumb items={breadcrumbItems} style={{ fontSize: 13 }} />
           <div style={{ flex: 1 }} />
           <ThemeSwitcher />
-          <span style={{ fontSize: 11, color: 'rgba(0,0,0,0.45)' }}>本地运行中</span>
+          <span style={{ fontSize: 11, color: 'rgba(0,0,0,0.45)' }}>让开发更省心</span>
           <Button
             type="text"
             icon={<GithubOutlined />}
