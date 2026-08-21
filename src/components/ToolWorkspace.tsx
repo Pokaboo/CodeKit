@@ -208,7 +208,7 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
       {/* 输出 */}
       <AccentCard
         className="lg:order-2 xl:order-3"
-        accent="#10b981"
+        accent={primary}
         title={PanelTitle({ icon: <FileCode2 size={15} />, text: '处理结果', color: '#fff' })}
         extra={
           <Button
