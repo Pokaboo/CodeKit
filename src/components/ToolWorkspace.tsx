@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { App, Button, Card, Input, Switch, Upload, Typography } from 'antd';
+import { App, Button, Input, Switch, Upload, Typography } from 'antd';
 import { Bolt, Copy, FileCode2, Image as ImageIcon, Lightbulb, UploadCloud, Wrench } from 'lucide-react';
 import type { ToolConfig } from '../types';
 import { toolIcons } from '../config/tools';
@@ -146,10 +146,10 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
       </AccentCard>
 
       {/* 配置 */}
-      <Card
+      <AccentCard
         className="lg:order-3 lg:col-span-2 xl:order-2 xl:col-span-1"
-        title={PanelTitle({ icon: <Wrench size={15} />, text: '处理配置', color: primary })}
-        styles={{ body: cardBodyStyle }}
+        accent={primary}
+        title={PanelTitle({ icon: <Wrench size={15} />, text: '处理配置', color: '#fff' })}
       >
         <div className="flex flex-col gap-2 lg:flex-row lg:flex-wrap lg:items-center lg:gap-x-8 lg:gap-y-2">
           {(tool.options ?? []).map((opt) => (
@@ -203,7 +203,7 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
             </Button>
           )}
         </div>
-      </Card>
+      </AccentCard>
 
       {/* 输出 */}
       <AccentCard
