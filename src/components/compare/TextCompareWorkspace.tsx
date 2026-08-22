@@ -103,7 +103,7 @@ export default function TextCompareWorkspace() {
           />
         </AccentCard>
         <AccentCard
-          accent="#10b981"
+          accent={primary}
           title={PanelTitle({ icon: <FileText size={15} />, text: '右侧对比文', color: '#fff' })}
         >
           <Input.TextArea
@@ -153,7 +153,7 @@ export default function TextCompareWorkspace() {
 
       {/* 输出区 */}
       <AccentCard
-        accent="#10b981"
+        accent={primary}
         title={PanelTitle({ icon: <GitCompareArrows size={15} />, text: '差异结果', color: '#fff' })}
       >
         <div
