@@ -72,7 +72,7 @@ export function formatDate(d: Date, format: string, tz: TzMode = 'local'): strin
     dddd: WD_LONG[p.weekday],
   };
   return format.replace(
-    /YYYY|YY|MM|M|DD|D|HH|H|mm|m|ss|s|A|ddd|dddd/g,
+    /YYYY|YY|MM|M|DD|D|HH|H|mm|m|ss|s|A|dddd|ddd/g,
     (t) => map[t] ?? t,
   );
 }

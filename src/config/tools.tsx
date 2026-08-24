@@ -23,6 +23,9 @@ import {
   CalendarClock,
   Calendar,
   Timer,
+  FlaskConical,
+  TimerReset,
+  Webhook,
 } from 'lucide-react';
 import type { CategoryConfig } from '../types';
 import ExcelCompareWorkspace from '../components/compare/ExcelCompareWorkspace';
@@ -31,6 +34,8 @@ import NowWorkspace from '../components/time/NowWorkspace';
 import TsToDateWorkspace from '../components/time/TsToDateWorkspace';
 import DateToTsWorkspace from '../components/time/DateToTsWorkspace';
 import TimeDiffWorkspace from '../components/time/TimeDiffWorkspace';
+import CronWorkspace from '../components/testing/CronWorkspace';
+import WebSocketWorkspace from '../components/testing/WebSocketWorkspace';
 import {
   formatJson,
   compressJson,
@@ -342,6 +347,35 @@ export const categories: CategoryConfig[] = [
     ],
   },
   {
+    id: 'testing',
+    label: '在线测试工具',
+    description: 'Cron 表达式生成与 WebSocket 连接测试',
+    tools: [
+      {
+        key: 'cron',
+        label: 'Cron 表达式生成器',
+        description: '可视化配置字段，实时校验并推算执行时间',
+        placeholder: '',
+        customWorkspace: CronWorkspace,
+        hint: {
+          text: '通过下拉与输入配置秒/分/时/日/月/周，实时预览表达式，支持合法性校验与后续执行时间推算。',
+          tone: 'info',
+        },
+      },
+      {
+        key: 'websocket',
+        label: 'WebSocket 测试',
+        description: '连接测试、消息收发日志与心跳检测',
+        placeholder: '',
+        customWorkspace: WebSocketWorkspace,
+        hint: {
+          text: '输入 WebSocket 地址即可连接测试，支持自定义消息、心跳检测与自动重连。',
+          tone: 'info',
+        },
+      },
+    ],
+  },
+  {
     id: 'more',
     label: '更多规划中',
     description: 'Regex Engine、JWT Debugger、Mock Server 规划中',
@@ -357,6 +391,7 @@ export const categoryIcons: Record<string, ReactNode> = {
   crypto: <ShieldCheck size={16} />,
   compare: <GitCompare size={16} />,
   time: <Clock size={16} />,
+  testing: <FlaskConical size={16} />,
   more: <Wrench size={16} />,
 };
 
@@ -383,6 +418,8 @@ export const toolIcons: Record<string, ReactNode> = {
   'ts-to-date': <CalendarClock size={14} />,
   'date-to-ts': <Calendar size={14} />,
   diff: <Timer size={14} />,
+  cron: <TimerReset size={14} />,
+  websocket: <Webhook size={14} />,
 };
 
 /** 全量工具 key → 所属分类 查找（路由/面包屑用） */
