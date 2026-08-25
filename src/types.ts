@@ -1,7 +1,7 @@
 import type { ComponentType } from 'react';
 
 /** 工具分类（一级菜单） */
-export type CategoryId = 'json' | 'xml' | 'sql' | 'crypto' | 'compare' | 'time' | 'testing' | 'more';
+export type CategoryId = 'json' | 'xml' | 'sql' | 'crypto' | 'compare' | 'time' | 'testing' | 'convert' | 'more';
 
 /** 工具选项（配置面板的开关项） */
 export interface ToolOption {

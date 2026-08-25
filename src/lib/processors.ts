@@ -157,3 +157,52 @@ export function asciiDecode(input: string): string {
   if (codes.some((n) => isNaN(n))) throw new Error('包含非法字符');
   return String.fromCodePoint(...codes);
 }
+
+/* ---------- CONVERT ---------- */
+
+/** URL 编码：基于 encodeURIComponent 标准，覆盖查询参数与路径片段转义 */
+export function urlEncode(input: string): string {
+  return encodeURIComponent(input);
+}
+
+/** URL 解码：还原 encodeURIComponent 编码结果（非法序列会抛出错误） */
+export function urlDecode(input: string): string {
+  return decodeURIComponent(input.trim());
+}
+
+/**
+ * 进制转换：自动识别 0x(十六) / 0b(二) / 0o(八) 前缀或纯十进制输入，
+ * 输出十进制、二进制、八进制、十六进制的完整表示。
+ */
+export function baseConvert(input: string): string {
+  const raw = input.trim();
+  if (!raw) throw new Error('请输入需要转换的数值');
+
+  let value: number;
+  let detected = '';
+  if (/^0x[0-9a-fA-F]+$/i.test(raw)) {
+    value = parseInt(raw.slice(2), 16);
+    detected = '十六进制 (0x)';
+  } else if (/^0b[01]+$/i.test(raw)) {
+    value = parseInt(raw.slice(2), 2);
+    detected = '二进制 (0b)';
+  } else if (/^0o[0-7]+$/i.test(raw)) {
+    value = parseInt(raw.slice(2), 8);
+    detected = '八进制 (0o)';
+  } else if (/^-?\d+$/.test(raw)) {
+    value = parseInt(raw, 10);
+    detected = '十进制';
+  } else {
+    throw new Error('无法识别的进制格式，支持 0x / 0b / 0o 前缀或纯十进制整数');
+  }
+
+  if (!Number.isFinite(value)) throw new Error('数值超出可解析范围');
+
+  return [
+    `输入识别: ${detected}`,
+    `十进制 (DEC): ${value}`,
+    `二进制 (BIN): ${value.toString(2)}`,
+    `八进制 (OCT): ${value.toString(8)}`,
+    `十六进制 (HEX): 0x${value.toString(16).toUpperCase()}`,
+  ].join('\n');
+}

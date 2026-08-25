@@ -26,6 +26,11 @@ import {
   FlaskConical,
   TimerReset,
   Webhook,
+  Repeat,
+  Link,
+  Unlink,
+  Calculator,
+  KeyRound,
 } from 'lucide-react';
 import type { CategoryConfig } from '../types';
 import ExcelCompareWorkspace from '../components/compare/ExcelCompareWorkspace';
@@ -36,6 +41,7 @@ import DateToTsWorkspace from '../components/time/DateToTsWorkspace';
 import TimeDiffWorkspace from '../components/time/TimeDiffWorkspace';
 import CronWorkspace from '../components/testing/CronWorkspace';
 import WebSocketWorkspace from '../components/testing/WebSocketWorkspace';
+import UuidWorkspace from '../components/convert/UuidWorkspace';
 import {
   formatJson,
   compressJson,
@@ -55,6 +61,9 @@ import {
   gbkToUtf8,
   asciiEncode,
   asciiDecode,
+  urlEncode,
+  urlDecode,
+  baseConvert,
 } from '../lib/processors';
 
 /**
@@ -267,6 +276,57 @@ export const categories: CategoryConfig[] = [
     ],
   },
   {
+    id: 'convert',
+    label: '转换工具',
+    description: 'URL 编解码、进制转换与 UUID 生成',
+    tools: [
+      {
+        key: 'url-encode',
+        label: 'URL 编码',
+        description: '对文本进行 URL 编码（encodeURIComponent）',
+        placeholder: 'https://example.com/搜索?q=测试',
+        process: urlEncode,
+        hint: {
+          text: '基于 encodeURIComponent 标准编码，适合对查询参数、路径片段进行转义。',
+          tone: 'info',
+        },
+        outputFile: 'output.txt',
+      },
+      {
+        key: 'url-decode',
+        label: 'URL 解码',
+        description: '将 URL 编码字符串还原为原始文本',
+        placeholder: 'https%3A%2F%2Fexample.com%2F%E6%90%9C%E7%B4%A2%3Fq%3D%E6%B5%8B%E8%AF%95',
+        process: urlDecode,
+        hint: { text: '还原 encodeURIComponent 编码结果，非法序列将提示错误。', tone: 'success' },
+        outputFile: 'output.txt',
+      },
+      {
+        key: 'base-convert',
+        label: '进制转换',
+        description: '十进制 / 二进制 / 八进制 / 十六进制互转',
+        placeholder: '255\n0xFF\n0b1010\n0o17',
+        process: baseConvert,
+        hint: {
+          text: '支持 0x(十六) / 0b(二) / 0o(八) 前缀或纯十进制输入，自动识别并输出四种进制表示。',
+          tone: 'info',
+        },
+        outputFile: 'output.txt',
+      },
+      {
+        key: 'uuid',
+        label: 'UUID 生成器',
+        description: '生成符合 RFC 4122 的 UUID v4',
+        placeholder: '',
+        customWorkspace: UuidWorkspace,
+        hint: {
+          text: '基于 crypto.getRandomValues 生成 UUID v4，支持批量、大写与去横线。',
+          tone: 'info',
+        },
+      },
+    ],
+  },
+  {
     id: 'compare',
     label: '数据对比工具',
     description: 'Excel 与文本的差异比对，可导出结果',
@@ -389,6 +449,7 @@ export const categoryIcons: Record<string, ReactNode> = {
   xml: <Braces size={16} />,
   sql: <Database size={16} />,
   crypto: <ShieldCheck size={16} />,
+  convert: <Repeat size={16} />,
   compare: <GitCompare size={16} />,
   time: <Clock size={16} />,
   testing: <FlaskConical size={16} />,
@@ -420,6 +481,10 @@ export const toolIcons: Record<string, ReactNode> = {
   diff: <Timer size={14} />,
   cron: <TimerReset size={14} />,
   websocket: <Webhook size={14} />,
+  'url-encode': <Link size={14} />,
+  'url-decode': <Unlink size={14} />,
+  'base-convert': <Calculator size={14} />,
+  uuid: <KeyRound size={14} />,
 };
 
 /** 全量工具 key → 所属分类 查找（路由/面包屑用） */
