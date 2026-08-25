@@ -51,7 +51,7 @@ export default function ComingSoon() {
             fontWeight: 700,
             letterSpacing: '-.5px',
             marginTop: 18,
-            background: `linear-gradient(90deg, ${primary}, ${ACCENT})`,
+            backgroundImage: `linear-gradient(90deg, ${primary}, ${ACCENT})`,
             WebkitBackgroundClip: 'text',
             backgroundClip: 'text',
             color: 'transparent',
