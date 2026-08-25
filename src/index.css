@@ -161,26 +161,63 @@ body {
   50% { opacity: 0.35; }
 }
 
-/* 「更多规划中」页面动画 */
-@keyframes ck-bounce {
-  0%, 100% { transform: translateY(0) rotate(-3deg); }
-  40% { transform: translateY(-30px) rotate(3deg); }
-  60% { transform: translateY(-12px) rotate(0); }
+/* ============ 更多规划中 · 发布页（方案C 浅色玻璃拟物，跟随主题） ============ */
+.ck-launch-wrap{
+  position:relative;
+  min-height:calc(100vh - 48px - 32px);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:32px 20px; text-align:center;
+  background:#eef2ff;
+  background:
+    radial-gradient(60% 60% at 18% 8%, color-mix(in srgb, var(--color-primary) 14%, transparent), transparent 55%),
+    radial-gradient(55% 55% at 86% 82%, color-mix(in srgb, var(--color-accent) 16%, transparent), transparent 55%),
+    linear-gradient(180deg,#fbfcff 0%, #eef2ff 100%);
 }
-@keyframes ck-shadow {
-  0%, 100% { transform: scaleX(1); opacity: .3; }
-  40% { transform: scaleX(.55); opacity: .14; }
-  60% { transform: scaleX(.82); opacity: .22; }
-}
-@keyframes ck-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-@keyframes ck-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: .3; }
-}
-@keyframes ck-bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
-}
+.ck-launch-eyebrow{font-size:13px;color:#64748b;letter-spacing:.5px;margin-bottom:10px;
+  border:1px solid rgba(15,23,42,.12);padding:4px 12px;border-radius:999px;background:rgba(255,255,255,.6)}
+.ck-launch-title{font-size:44px;font-weight:700;letter-spacing:-.8px;margin-bottom:10px;
+  background-image:linear-gradient(90deg,var(--color-primary),var(--color-accent));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.ck-launch-sub{font-size:17px;color:#475569;font-weight:400}
+
+.ck-launch-card{position:relative;width:min(840px,92vw);margin-top:40px;border-radius:34px;padding:28px;
+  background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.85);
+  box-shadow:0 0 0 1px rgba(15,23,42,.03) inset,0 30px 80px rgba(37,99,235,.14),0 0 70px rgba(124,58,237,.12);
+  backdrop-filter:blur(22px)}
+.ck-launch-glow{position:absolute;inset:-50px;background:radial-gradient(circle at 50% 0%,rgba(99,102,241,.22),transparent 60%);z-index:-1;pointer-events:none}
+
+.ck-launch-window{border-radius:20px;overflow:hidden;background:#fff;border:1px solid rgba(15,23,42,.08);box-shadow:0 24px 60px rgba(15,23,42,.1)}
+.ck-launch-titlebar{height:36px;display:flex;align-items:center;padding:0 14px;gap:7px;background:rgba(15,23,42,.03);border-bottom:1px solid rgba(15,23,42,.06)}
+.ck-launch-dot{width:10px;height:10px;border-radius:50%}
+.ck-launch-dot.r{background:#ef4444}.ck-launch-dot.y{background:#f59e0b}.ck-launch-dot.g{background:#10b981}
+.ck-launch-t{font-size:12px;color:#94a3b8;margin-left:8px}
+.ck-launch-body{display:flex;height:260px}
+.ck-launch-sidebar{width:54px;background:#f8fafc;border-right:1px solid rgba(15,23,42,.06);display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:10px}
+.ck-launch-si{width:28px;height:28px;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.07);display:flex;align-items:center;justify-content:center;font-size:13px}
+.ck-launch-main{flex:1;padding:16px;display:flex;gap:14px;background:rgba(248,250,252,.5)}
+.ck-launch-panel{flex:1;border-radius:14px;background:rgba(255,255,255,.85);border:1px solid rgba(15,23,42,.06);padding:14px}
+
+.ck-launch-tab{display:flex;align-items:center;gap:6px;font-size:11px;color:#64748b;margin-bottom:8px}
+.ck-launch-tabdot{width:6px;height:6px;border-radius:50%}
+.ck-launch-code{font-family:var(--font-mono);font-size:10.5px;line-height:1.7;color:#334155;
+  padding:10px;border-radius:10px;background:#f8fafc;border:1px solid rgba(15,23,42,.05);white-space:pre}
+.ck-c-key{color:var(--color-primary)} .ck-c-str{color:#10b981} .ck-c-bool{color:#f59e0b;font-weight:500} .ck-c-punc{color:#94a3b8}
+
+.ck-launch-float{position:absolute;border-radius:18px;background:rgba(255,255,255,.8);border:1px solid rgba(15,23,42,.08);backdrop-filter:blur(12px);box-shadow:0 14px 40px rgba(15,23,42,.12);display:flex;align-items:center;justify-content:center;animation:ck-launch-bob 5s ease-in-out infinite}
+@keyframes ck-launch-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.ck-launch-bolt{left:-36px;top:40px;width:68px;height:68px;color:var(--color-primary)}
+.ck-launch-bolt svg{width:30px;height:30px;filter:drop-shadow(0 0 10px rgba(37,99,235,.35))}
+.ck-launch-timer{right:24px;top:-24px;height:42px;padding:0 16px;font-family:var(--font-mono);font-size:17px;color:var(--color-primary);letter-spacing:1px;border-radius:999px;animation-delay:1s}
+.ck-launch-dots{right:24px;top:22px;width:40px;height:24px;gap:4px;background:rgba(255,255,255,.7);animation-delay:2s}
+.ck-launch-dots span{width:4px;height:4px;border-radius:50%;background:rgba(15,23,42,.3)}
+.ck-launch-cubes{position:absolute;right:-58px;bottom:20px;width:110px;height:100px;animation:ck-launch-bob 5.5s ease-in-out infinite;animation-delay:.6s}
+.ck-launch-cube{position:absolute;width:44px;height:44px;border-radius:10px;border:1px solid rgba(15,23,42,.1);box-shadow:0 12px 30px rgba(15,23,42,.12),inset 0 1px 0 rgba(255,255,255,.7)}
+.ck-launch-cube.c1{bottom:0;left:22px;background:linear-gradient(145deg,#2563eb,#3b82f6)}
+.ck-launch-cube.c2{bottom:28px;left:44px;background:linear-gradient(145deg,#60a5fa,#93c5fd)}
+.ck-launch-cube.c3{bottom:56px;left:66px;background:linear-gradient(145deg,#bfdbfe,#e0f2fe)}
+
+.ck-launch-chips{display:flex;gap:14px;margin-top:38px;justify-content:center;flex-wrap:wrap}
+.ck-launch-chip{padding:10px 26px;border-radius:999px;font-size:14px;font-weight:500;color:#334155;background:rgba(255,255,255,.7);border:1px solid rgba(15,23,42,.1);box-shadow:0 4px 12px rgba(15,23,42,.06);transition:transform .15s,background .15s;cursor:pointer}
+.ck-launch-chip:hover{transform:translateY(-2px);background:#fff;color:#0f172a}
+.ck-launch-chipdot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:7px}
+.ck-launch-foot{margin-top:34px;font-size:12px;color:#94a3b8}
