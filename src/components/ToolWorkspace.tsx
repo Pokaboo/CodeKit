@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { App, Button, Input, Switch, Upload, Typography } from 'antd';
-import { Bolt, Copy, FileCode2, Image as ImageIcon, Lightbulb, UploadCloud, Wrench } from 'lucide-react';
+import { App, Button, Input, Segmented, Switch, Upload, Typography } from 'antd';
+import { Bolt, Copy, FileCode2, FileUp, Image as ImageIcon, Lightbulb, UploadCloud, Wrench } from 'lucide-react';
 import type { ToolConfig } from '../types';
 import { toolIcons } from '../config/tools';
 import InfoCard from './InfoCard';
@@ -31,6 +31,12 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
   const [imageDataUrl, setImageDataUrl] = useState('');
   const [processing, setProcessing] = useState(false);
 
+  // 任意文件转 Base64
+  const [fileDataUrl, setFileDataUrl] = useState('');
+  const [fileName, setFileName] = useState('');
+  const [fileSize, setFileSize] = useState(0);
+  const [fileMode, setFileMode] = useState<'dataurl' | 'base64'>('dataurl');
+
   const [options, setOptions] = useState<Record<string, boolean>>(() =>
     Object.fromEntries((tool.options ?? []).map((o) => [o.key, o.defaultValue])),
   );
@@ -38,8 +44,18 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
     setInput('');
     setOutput('');
     setImageDataUrl('');
+    setFileDataUrl('');
+    setFileName('');
+    setFileSize(0);
+    setFileMode('dataurl');
     setOptions(Object.fromEntries((tool.options ?? []).map((o) => [o.key, o.defaultValue])));
   }, [tool]);
+
+  // 文件输出格式切换时同步结果
+  useEffect(() => {
+    if (!fileDataUrl) return;
+    setOutput(fileMode === 'dataurl' ? fileDataUrl : (fileDataUrl.split(',')[1] ?? ''));
+  }, [fileMode, fileDataUrl]);
 
   const run = async () => {
     if (!tool.process) return;
@@ -70,6 +86,26 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
     message.success('图片已转换为 Base64');
   };
 
+  /** 任意文件 → Base64 / Data URL */
+  const handleFile = async (file: File) => {
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      setFileDataUrl(dataUrl);
+      setFileName(file.name);
+      setFileSize(file.size);
+      setOutput(fileMode === 'dataurl' ? dataUrl : (dataUrl.split(',')[1] ?? ''));
+      message.success(`已转换 ${file.name}`);
+    } catch {
+      message.error('文件读取失败，请重试');
+    }
+  };
+
+  const humanSize = (n: number) => {
+    if (n < 1024) return `${n} B`;
+    if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+    return `${(n / 1024 / 1024).toFixed(2)} MB`;
+  };
+
   const copy = async () => {
     if (!output) return;
     try {
@@ -81,6 +117,7 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
   };
 
   const isImageMode = tool.accept === 'image';
+  const isFileMode = tool.accept === 'file';
   // 输出语法高亮（依据注册表 outputFile 推断语言）
   const highlighted = useMemo(
     () => highlightCode(output, tool.outputFile ?? 'output.txt'),
@@ -99,7 +136,14 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
             type="text"
             size="small"
             style={{ color: 'rgba(255,255,255,0.88)' }}
-            onClick={() => { setInput(''); setOutput(''); setImageDataUrl(''); }}
+            onClick={() => {
+              setInput('');
+              setOutput('');
+              setImageDataUrl('');
+              setFileDataUrl('');
+              setFileName('');
+              setFileSize(0);
+            }}
           >
             清空
           </Button>
@@ -125,6 +169,45 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
               </div>
             )}
           </Upload.Dragger>
+        ) : isFileMode ? (
+          <div className="flex flex-col gap-3">
+            <Segmented
+              value={fileMode}
+              onChange={(v) => setFileMode(v as 'dataurl' | 'base64')}
+              options={[
+                { value: 'dataurl', label: 'Data URL' },
+                { value: 'base64', label: '纯 Base64' },
+              ]}
+              size="small"
+            />
+            <Upload.Dragger
+              accept="*"
+              showUploadList={false}
+              beforeUpload={() => false}
+              onChange={({ file }) => {
+                if (file.originFileObj) void handleFile(file.originFileObj as File);
+              }}
+              style={{ background: '#f8fafc' }}
+            >
+              {fileName ? (
+                <div style={{ padding: '12px 0' }}>
+                  <FileUp size={28} style={{ color: primary }} />
+                  <div style={{ marginTop: 8, fontSize: 13, color: '#0f172a' }}>{fileName}</div>
+                  <div style={{ marginTop: 2, fontSize: 12, color: '#94a3b8' }}>
+                    {humanSize(fileSize)} · 点击或拖入其他文件替换
+                  </div>
+                </div>
+              ) : (
+                <div style={{ padding: '12px 0' }}>
+                  <UploadCloud size={32} style={{ color: '#94a3b8' }} />
+                  <div style={{ marginTop: 8, fontSize: 13, color: '#475569' }}>拖放任意文件或点击选择</div>
+                  <div style={{ marginTop: 4, fontSize: 12, color: '#94a3b8' }}>
+                    图片 / PDF / 压缩包 / 字体等，转换在本机完成
+                  </div>
+                </div>
+              )}
+            </Upload.Dragger>
+          </div>
         ) : (
           <Input.TextArea
             value={input}
@@ -141,6 +224,14 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
             style={{ marginTop: 10, fontSize: 12, color: '#94a3b8', textAlign: 'center' }}
           >
             Base64 长度: {output.length.toLocaleString()} 字符
+          </div>
+        )}
+        {isFileMode && fileName && (
+          <div
+            className="ck-code"
+            style={{ marginTop: 10, fontSize: 12, color: '#94a3b8', textAlign: 'center' }}
+          >
+            {fileMode === 'dataurl' ? 'Data URL' : 'Base64'} 长度: {output.length.toLocaleString()} 字符
           </div>
         )}
       </AccentCard>
@@ -185,7 +276,11 @@ export default function ToolWorkspace({ tool }: ToolWorkspaceProps) {
 
           {!tool.process && (
             <div className="lg:flex-1 lg:min-w-[200px]">
-              <InfoCard icon={<ImageIcon size={14} />} text="该工具为图片输入模式，上传后自动转换。" tone="info" />
+              <InfoCard
+                icon={isFileMode ? <FileUp size={14} /> : <ImageIcon size={14} />}
+                text={isFileMode ? '上传任意文件后自动转换为 Base64，可切换输出格式。' : '该工具为图片输入模式，上传后自动转换。'}
+                tone="info"
+              />
             </div>
           )}
 

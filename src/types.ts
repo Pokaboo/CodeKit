@@ -1,7 +1,19 @@
 import type { ComponentType } from 'react';
 
 /** 工具分类（一级菜单） */
-export type CategoryId = 'json' | 'xml' | 'sql' | 'crypto' | 'compare' | 'time' | 'testing' | 'convert' | 'more';
+export type CategoryId =
+  | 'json'
+  | 'xml'
+  | 'sql'
+  | 'crypto'
+  | 'convert'
+  | 'text'
+  | 'frontend'
+  | 'generator'
+  | 'compare'
+  | 'time'
+  | 'testing'
+  | 'more';
 
 /** 工具选项（配置面板的开关项） */
 export interface ToolOption {
@@ -21,8 +33,8 @@ export interface ToolConfig {
   label: string;
   description: string;
   placeholder: string;
-  /** 输入模式：文本或图片上传 */
-  accept?: 'text' | 'image';
+  /** 输入模式：文本 / 图片上传 / 任意文件上传 */
+  accept?: 'text' | 'image' | 'file';
   /** 纯函数处理器：input + options → output。返回 Promise 以支持异步（如 GBK 编码） */
   process?: (input: string, options: Record<string, boolean>) => string | Promise<string>;
   /** 配置面板开关项 */

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { lazy, type ComponentType, type ReactNode } from 'react';
 import {
   FileJson,
   Braces,
@@ -31,17 +31,38 @@ import {
   Unlink,
   Calculator,
   KeyRound,
+  Regex,
+  FileUp,
+  Palette,
+  FileCode2,
+  GitCompareArrows,
+  QrCode,
+  Shuffle,
+  BarChart3,
+  FileType2,
+  Type,
+  Wand2,
 } from 'lucide-react';
-import type { CategoryConfig } from '../types';
+import type { CategoryConfig, ToolConfig } from '../types';
 import ExcelCompareWorkspace from '../components/compare/ExcelCompareWorkspace';
 import TextCompareWorkspace from '../components/compare/TextCompareWorkspace';
+import JsonDiffWorkspace from '../components/compare/JsonDiffWorkspace';
 import NowWorkspace from '../components/time/NowWorkspace';
 import TsToDateWorkspace from '../components/time/TsToDateWorkspace';
 import DateToTsWorkspace from '../components/time/DateToTsWorkspace';
 import TimeDiffWorkspace from '../components/time/TimeDiffWorkspace';
 import CronWorkspace from '../components/testing/CronWorkspace';
 import WebSocketWorkspace from '../components/testing/WebSocketWorkspace';
+import RegexTesterWorkspace from '../components/testing/RegexTesterWorkspace';
 import UuidWorkspace from '../components/convert/UuidWorkspace';
+import ColorWorkspace from '../components/frontend/ColorWorkspace';
+import QrWorkspace from '../components/generator/QrWorkspace';
+import MockWorkspace from '../components/generator/MockWorkspace';
+import TextStatsWorkspace from '../components/text/TextStatsWorkspace';
+import EscapeWorkspace from '../components/text/EscapeWorkspace';
+
+// 代码美化：prettier 体量较大，整个工作台按需加载（React.lazy + 路由 Suspense）
+const CodeFormatWorkspace = lazy(() => import('../components/frontend/CodeFormatWorkspace'));
 import {
   formatJson,
   compressJson,
@@ -273,6 +294,18 @@ export const categories: CategoryConfig[] = [
         hint: { text: '将空格分隔的十进制码点序列还原为原始文本。', tone: 'success' },
         outputFile: 'output.txt',
       },
+      {
+        key: 'file-to-base64',
+        label: '文件转 Base64',
+        description: '上传任意文件，输出 Data URL 或纯 Base64',
+        placeholder: '',
+        accept: 'file',
+        hint: {
+          text: '支持图片、PDF、压缩包、字体等任意文件，读取与转换全部在浏览器本地完成，不会上传。',
+          tone: 'info',
+        },
+        outputFile: 'output.base64',
+      },
     ],
   },
   {
@@ -327,9 +360,96 @@ export const categories: CategoryConfig[] = [
     ],
   },
   {
+    id: 'text',
+    label: '文本工具',
+    description: '文本统计与 Unicode / HTML / JS / JSON 转义',
+    tools: [
+      {
+        key: 'stats',
+        label: '文本统计',
+        description: '字符数、UTF-8 字节、行数、词数实时统计',
+        placeholder: '',
+        customWorkspace: TextStatsWorkspace,
+        hint: {
+          text: '边输入边统计字符数、UTF-8 字节数、行数、段落数与中英文占比，适合校验字段长度限制。',
+          tone: 'info',
+        },
+      },
+      {
+        key: 'escape',
+        label: '转义工具',
+        description: 'Unicode / HTML 实体 / JS / JSON 字符串互转',
+        placeholder: '',
+        customWorkspace: EscapeWorkspace,
+        hint: {
+          text: '支持 Unicode（\\uXXXX）、HTML 实体、JS 字符串与 JSON 字符串的双向转换，编码/解码一键切换。',
+          tone: 'info',
+        },
+      },
+    ],
+  },
+  {
+    id: 'frontend',
+    label: '前端工具',
+    description: '颜色换算、WCAG 对比度、HTML/CSS/JS 美化',
+    tools: [
+      {
+        key: 'color',
+        label: '颜色工具',
+        description: 'HEX / RGB / HSL 互转、对比度检测与 Tailwind 色阶',
+        placeholder: '',
+        customWorkspace: ColorWorkspace,
+        hint: {
+          text: '输入任意颜色，实时得到 HEX / RGB / HSL 三种表示，并给出 WCAG 对比度等级与最接近的 Tailwind 色阶。',
+          tone: 'info',
+        },
+      },
+      {
+        key: 'code-format',
+        label: '代码美化',
+        description: 'HTML / CSS / SCSS / JS / TS / Vue 格式化',
+        placeholder: '',
+        customWorkspace: CodeFormatWorkspace as unknown as ComponentType<{ tool: ToolConfig }>,
+        hint: {
+          text: '基于 prettier 本地格式化，引擎按需加载（独立 chunk）；支持缩进、行宽、分号与引号风格配置。',
+          tone: 'info',
+        },
+      },
+    ],
+  },
+  {
+    id: 'generator',
+    label: '生成工具',
+    description: '二维码生成解析与 Mock 数据生成',
+    tools: [
+      {
+        key: 'qr',
+        label: '二维码生成 / 解析',
+        description: '文本转二维码，或从图片中识别二维码内容',
+        placeholder: '',
+        customWorkspace: QrWorkspace,
+        hint: {
+          text: '生成支持容错等级、尺寸、留白与配色自定义；解析支持拖入图片本地识别，内容不出浏览器。',
+          tone: 'info',
+        },
+      },
+      {
+        key: 'mock',
+        label: 'Mock 数据生成',
+        description: '按字段名或 JSON 模板生成模拟数据',
+        placeholder: '',
+        customWorkspace: MockWorkspace,
+        hint: {
+          text: '按字段名语义（name / email / phone / price…）生成假数据，也可粘贴 JSON 模板批量复制结构。',
+          tone: 'info',
+        },
+      },
+    ],
+  },
+  {
     id: 'compare',
     label: '数据对比工具',
-    description: 'Excel 与文本的差异比对，可导出结果',
+    description: 'Excel、文本与 JSON 的差异比对，可导出结果',
     tools: [
       {
         key: 'excel',
@@ -350,6 +470,17 @@ export const categories: CategoryConfig[] = [
         customWorkspace: TextCompareWorkspace,
         hint: {
           text: '左侧原文、右侧对比文，点击对比后以红/绿标注新增与删除的行。',
+          tone: 'info',
+        },
+      },
+      {
+        key: 'json',
+        label: 'JSON 对比',
+        description: '按 key 与数组下标逐层对齐，输出路径级差异',
+        placeholder: '',
+        customWorkspace: JsonDiffWorkspace,
+        hint: {
+          text: '结构化比对两个 JSON：对象按 key、数组按下标递归展开，直接给出 $.user.name 这类路径级差异。',
           tone: 'info',
         },
       },
@@ -433,12 +564,23 @@ export const categories: CategoryConfig[] = [
           tone: 'info',
         },
       },
+      {
+        key: 'regex',
+        label: '正则测试器',
+        description: '实时高亮匹配、分组明细与替换预览',
+        placeholder: '',
+        customWorkspace: RegexTesterWorkspace,
+        hint: {
+          text: '输入表达式与测试文本，实时高亮命中位置、列出捕获分组，并支持 $1 等占位符的替换预览。',
+          tone: 'info',
+        },
+      },
     ],
   },
   {
     id: 'more',
     label: '更多规划中',
-    description: 'Regex Engine、JWT Debugger、Mock Server 规划中',
+    description: 'JWT 调试器、HTTP 请求测试、JSONPath 等持续更新',
     tools: [],
   },
 ];
@@ -450,6 +592,9 @@ export const categoryIcons: Record<string, ReactNode> = {
   sql: <Database size={16} />,
   crypto: <ShieldCheck size={16} />,
   convert: <Repeat size={16} />,
+  text: <Type size={16} />,
+  frontend: <Palette size={16} />,
+  generator: <Wand2 size={16} />,
   compare: <GitCompare size={16} />,
   time: <Clock size={16} />,
   testing: <FlaskConical size={16} />,
@@ -485,6 +630,15 @@ export const toolIcons: Record<string, ReactNode> = {
   'url-decode': <Unlink size={14} />,
   'base-convert': <Calculator size={14} />,
   uuid: <KeyRound size={14} />,
+  'file-to-base64': <FileUp size={14} />,
+  stats: <BarChart3 size={14} />,
+  escape: <FileType2 size={14} />,
+  color: <Palette size={14} />,
+  'code-format': <FileCode2 size={14} />,
+  qr: <QrCode size={14} />,
+  mock: <Shuffle size={14} />,
+  json: <GitCompareArrows size={14} />,
+  regex: <Regex size={14} />,
 };
 
 /** 全量工具 key → 所属分类 查找（路由/面包屑用） */

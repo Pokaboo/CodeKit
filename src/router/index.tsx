@@ -1,6 +1,6 @@
-import { Fragment } from 'react';
+import { Fragment, Suspense } from 'react';
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { Tag } from 'antd';
+import { Spin, Tag } from 'antd';
 import type { CategoryConfig, ToolConfig } from '../types';
 import { categories, findCategory } from '../config/tools';
 import { useTheme } from '../theme/ThemeContext';
@@ -47,7 +47,20 @@ function ToolPage({ catId, tool }: { catId: string; tool: ToolConfig }) {
           让开发更省心
         </Tag>
       </div>
-      {Body ? <Body tool={tool} /> : <ToolWorkspace tool={tool} />}
+      {Body ? (
+        <Suspense
+          fallback={
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '80px 0' }}>
+              <Spin />
+              <span style={{ fontSize: 12, color: '#94a3b8' }}>正在加载工具…</span>
+            </div>
+          }
+        >
+          <Body tool={tool} />
+        </Suspense>
+      ) : (
+        <ToolWorkspace tool={tool} />
+      )}
     </div>
   );
 }

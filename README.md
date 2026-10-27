@@ -50,11 +50,25 @@
 | **压缩 (Compress)** | 合并多余空白，将 SQL 压缩为单行 |
 | **转 IN 查询** | 将换行/逗号分隔的列表数据，自动转换为 `IN (...)` 子句 |
 
+### 🔷 开发辅助工具
+
+| 分类 | 工具 | 说明 |
+|------|------|------|
+| **在线测试** | **正则测试器** | 实时高亮命中、捕获分组明细与 `$1` 替换预览，内置常用表达式 |
+| **加解密** | **文件转 Base64** | 上传任意文件，输出 Data URL 或纯 Base64（本地读取） |
+| **前端** | **颜色工具** | HEX/RGB/HSL 互转、WCAG 对比度检测、Tailwind 色阶匹配与生成 |
+| **前端** | **代码美化** | HTML / CSS / SCSS / Less / JS / TS / Vue / JSON（prettier 按需加载） |
+| **数据对比** | **JSON 对比** | 对象按 key、数组按下标逐层对齐，输出 `$.user.name` 路径级差异 |
+| **生成** | **二维码生成 / 解析** | 自定义尺寸、留白、容错等级与配色；拖入图片本地识别 |
+| **生成** | **Mock 数据生成** | 按字段名语义或 JSON 模板生成假数据，支持中英文数据 |
+| **文本** | **文本统计** | 字符数、UTF-8 字节、行数、段落数、词数与中英文占比实时统计 |
+| **文本** | **转义工具** | Unicode（`\uXXXX`）、HTML 实体、JS 字符串、JSON 字符串双向转换 |
+
 ### 🔮 更多工具（规划中）
 
-- 正则表达式语法树引擎 (Regex Engine)
 - JWT 调试器 (JWT Debugger)
-- Mock 数据服务器 (Mock Server)
+- HTTP 请求测试（受 CORS 限制，需评估方案）
+- JSONPath 查询 / JSON Schema 生成
 
 ---
 
@@ -80,14 +94,28 @@ CodeKit/
     │
     ├── lib/
     │   ├── utils.ts            # cn() 类名合并
-    │   └── processors.ts       # 纯函数处理器（json/xml/sql/crypto）
+    │   ├── processors.ts       # 纯函数处理器（json/xml/sql/crypto）
+    │   ├── color.ts            # 颜色换算、WCAG 对比度、Tailwind 色阶
+    │   ├── textTools.ts        # 文本统计与各类转义
+    │   ├── jsonDiff.ts         # JSON 键级结构化对比
+    │   ├── mock.ts             # 字段名语义推断与 Mock 数据生成
+    │   ├── codeFormat.ts       # prettier 动态加载封装
+    │   ├── cron.ts             # Cron 解析与执行时间推算
+    │   └── timeUtils.ts        # 时间格式化与换算
     │
     ├── layouts/
     │   └── MainLayout.tsx      # 后台布局：Sider 菜单 + 顶栏面包屑 + 内容区
     │
     ├── components/
-    │   ├── ToolWorkspace.tsx   # 通用三栏工作台（输入/配置/输出）
-    │   └── InfoCard.tsx        # 统一提示卡片
+    │   ├── ToolWorkspace.tsx   # 通用三栏工作台（输入/配置/输出/文件上传）
+    │   ├── InfoCard.tsx        # 统一提示卡片
+    │   ├── compare/            # Excel / 文本 / JSON 结构化对比
+    │   ├── time/               # 时间戳与日期互转
+    │   ├── testing/            # Cron / WebSocket / 正则测试
+    │   ├── convert/            # UUID 生成
+    │   ├── text/               # 文本统计、转义工具
+    │   ├── frontend/           # 颜色工具、代码美化（React.lazy）
+    │   └── generator/          # 二维码、Mock 数据
     │
     ├── pages/
     │   ├── ComingSoon.tsx      # 规划中页面
@@ -131,6 +159,8 @@ CodeKit/
 | **反馈** | antd message | 操作提示 |
 | **JSON→XML** | fast-xml-parser | XML 解析与构建 |
 | **SQL 美化** | sql-formatter | SQL 语句标准格式化 |
+| **代码美化** | prettier (standalone) | 按语言动态加载的 HTML/CSS/JS/TS 格式化 |
+| **二维码** | qrcode / jsQR | 二维码生成与本地图片识别 |
 | **哈希** | md5 | MD5 摘要 |
 
 ---
