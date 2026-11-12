@@ -130,16 +130,90 @@ body {
 }
 
 /* Sider 滚动修复：antd 中间层 .ant-layout-sider-children 需为 flex 列容器，
-   菜单区 flex:1 + min-height:0 才能独立滚动（logo 与版本号固定） */
+   菜单区 flex:1 + min-height:0 才能独立滚动（logo 与版本号固定）。
+
+   方案 A · 原生滚动条主题化收编：
+   消除 Windows/Chromium 的白轨道 + 灰色滑块 + 上下三角箭头，
+   改为与 #0f172a 侧栏同色系的细滑块，滚动条出现/消失不再造成文字横向跳动。
+   侧栏底色固定（Layout.siderBg / Menu.darkItemBg 均为 #0f172a），主题切换只改主色，
+   因此统一使用中性半透明白，换肤后依旧协调。 */
 .ck-sider .ant-layout-sider-children {
   display: flex;
   flex-direction: column;
   height: 100%;
+  background: #0f172a;
 }
 .ck-sider .ck-sider-menu {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #0f172a;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.24) transparent;
+  scrollbar-gutter: stable;
+  /* 上下 8px 渐隐，与容器自身的 8px 垂直 padding 对齐，
+     只柔化边缘空白，不削弱首尾菜单项文字 */
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 8px, #000 calc(100% - 8px), transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 8px, #000 calc(100% - 8px), transparent 100%);
+}
+
+/* WebKit 内核（Chromium < 121 / Safari）的精细样式：
+   Chrome 121+ 会优先采用上面的标准属性，此处作为旧内核兜底。 */
+.ck-sider .ck-sider-menu::-webkit-scrollbar {
+  width: 6px;
+}
+.ck-sider .ck-sider-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ck-sider .ck-sider-menu::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.18);
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+.ck-sider .ck-sider-menu:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+.ck-sider .ck-sider-menu::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+.ck-sider .ck-sider-menu::-webkit-scrollbar-thumb:active {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+.ck-sider .ck-sider-menu::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+.ck-sider .ck-sider-menu::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* 窄屏（< lg）改走 Drawer，菜单没有 .ck-sider-menu 包装。
+   沿用同一套深色滚动条皮肤，避免断点切换后又出现原生白轨道。
+   这里不加渐隐遮罩：Drawer body 含 logo，没有 8px padding 保护。 */
+.ant-drawer-body:has(.ant-menu-dark) {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.24) transparent;
+  scrollbar-gutter: stable;
+}
+.ant-drawer-body:has(.ant-menu-dark)::-webkit-scrollbar {
+  width: 6px;
+}
+.ant-drawer-body:has(.ant-menu-dark)::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ant-drawer-body:has(.ant-menu-dark)::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.18);
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+.ant-drawer-body:has(.ant-menu-dark)::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* AccentCard 顶部色条：压缩头部高度，比 antd 默认（约 56px）更纤细。
