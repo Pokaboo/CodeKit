@@ -295,3 +295,58 @@ body {
 .ck-launch-chip:hover{transform:translateY(-2px);background:#fff;color:#0f172a}
 .ck-launch-chipdot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:7px}
 .ck-launch-foot{margin-top:34px;font-size:12px;color:#94a3b8}
+
+/* ============ 差异结果面板（文本对比 / 后续共用） ============ */
+.ck-diff-tag{display:inline-flex;align-items:center;padding:1px 9px;border-radius:6px;font-size:12px;line-height:20px}
+.ck-diff-tag-add{background:#ecfdf5;color:#059669}
+.ck-diff-tag-del{background:#fef2f2;color:#dc2626}
+.ck-diff-tag-mod{background:#fffbeb;color:#b45309}
+.ck-diff-tag-same{background:#eff6ff;color:#2563eb}
+.ck-diff-tag-info{background:#f1f5f9;color:#475569}
+
+.ck-diff-output{background:#0f172a;border-radius:10px;padding:14px;min-height:180px;max-height:560px;overflow:auto;
+  color:#e2e8f0;font-family:var(--font-mono);font-size:13px;line-height:1.7}
+.ck-diff-empty{color:#64748b;font-size:13px}
+.ck-diff-head{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));position:sticky;top:-14px;z-index:2;
+  background:#0f172a;padding:4px 10px 8px;color:#94a3b8;font-family:var(--font-sans);font-size:12px;
+  border-bottom:0.5px solid rgba(255,255,255,.12)}
+.ck-diff-head>div:last-child{border-left:0.5px solid rgba(255,255,255,.12);padding-left:10px}
+
+.ck-diff-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));content-visibility:auto;contain-intrinsic-size:24px}
+.ck-diff-cell{display:flex;gap:10px;padding:1px 10px;min-width:0;align-items:flex-start}
+.ck-diff-cell:last-child{border-left:0.5px solid rgba(255,255,255,.08)}
+.ck-diff-no{flex:0 0 34px;text-align:right;color:#64748b;user-select:none;font-size:12px}
+.ck-diff-text{flex:1;min-width:0;white-space:pre-wrap;word-break:break-word}
+.ck-diff-removed .ck-diff-cell:first-child{background:rgba(239,68,68,.15);color:#fecaca}
+.ck-diff-added .ck-diff-cell:last-child{background:rgba(16,185,129,.15);color:#bbf7d0}
+.ck-diff-modified .ck-diff-cell:first-child{background:rgba(239,68,68,.1)}
+.ck-diff-modified .ck-diff-cell:last-child{background:rgba(16,185,129,.1)}
+.ck-hl-a{background:#b91c1c;color:#fff;border-radius:2px;padding:0 1px}
+.ck-hl-b{background:#15803d;color:#fff;border-radius:2px;padding:0 1px}
+.ck-diff-fold{grid-column:1 / -1;text-align:center;color:#94a3b8;font-family:var(--font-sans);font-size:12px;
+  padding:5px 0;margin:3px 0;border-top:1px dashed rgba(255,255,255,.14);border-bottom:1px dashed rgba(255,255,255,.14);
+  background:rgba(255,255,255,.03)}
+
+.ck-diff-u{display:flex;gap:10px;padding:1px 10px;content-visibility:auto;contain-intrinsic-size:24px}
+.ck-diff-u-del{background:rgba(239,68,68,.14);color:#fecaca}
+.ck-diff-u-add{background:rgba(16,185,129,.14);color:#bbf7d0}
+.ck-diff-u-eq{color:#94a3b8}
+.ck-diff-u .ck-diff-no{flex:0 0 34px}
+
+/* ============ Excel 对比：统计卡 / 解析预览 / 并排网格 ============ */
+.ck-stat-card{flex:1 1 0;min-width:110px;padding:12px 14px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0}
+.ck-stat-label{font-size:12px;color:#64748b}
+.ck-stat-value{font-size:22px;font-weight:500;margin-top:2px}
+.ck-preview-table{border-collapse:collapse;width:100%;font-size:11.5px}
+.ck-preview-table th,.ck-preview-table td{border-bottom:1px solid #e2e8f0;padding:3px 8px;white-space:nowrap;text-align:left}
+.ck-preview-table th{background:#f8fafc;color:#475569;font-weight:500}
+.ck-grid-table{border-collapse:collapse;width:100%;font-size:12px}
+.ck-grid-table th,.ck-grid-table td{border:1px solid #e2e8f0;padding:4px 8px;white-space:nowrap;text-align:left}
+.ck-grid-table thead th{background:#f8fafc;position:sticky;top:0;z-index:1;color:#475569;font-weight:500}
+.ck-grid-table thead tr:nth-child(2) th{top:29px}
+.ck-grid-sub{background:#fff;color:#94a3b8;font-size:11px}
+.ck-grid-key{background:#f1f5f9;font-weight:500}
+.ck-grid-chg-a{background:#fee2e2;color:#991b1b}
+.ck-grid-chg-b{background:#d1fae5;color:#065f46}
+.ck-grid-only-a{background:#fef2f2}
+.ck-grid-only-b{background:#ecfdf5}

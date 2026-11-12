@@ -1,8 +1,16 @@
 import { useMemo, useState } from 'react';
-import { App, Button, Card, Input, Switch, Tag } from 'antd';
+import { App, Button, Card, Input, Switch } from 'antd';
 import { Braces, Copy, GitCompareArrows, ListTree } from 'lucide-react';
 import { useTheme } from '../../theme/ThemeContext';
-import { AccentCard, PanelTitle, cardBodyStyle } from '../compare/parts';
+import {
+  AccentCard,
+  DiffEmptyState,
+  DiffNotesPanel,
+  DiffStatBar,
+  PanelTitle,
+  RecentComparisons,
+  cardBodyStyle,
+} from '../compare/parts';
 import { changesToText, diffJson, summarize, type JsonChange } from '../../lib/jsonDiff';
 
 const SAMPLE_A = `{
@@ -135,10 +143,14 @@ export default function JsonDiffWorkspace() {
       <Card className="ck-rise" styles={{ body: cardBodyStyle }}>
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-            <Tag color="success" style={{ borderRadius: 6, margin: 0 }}>新增 {summary.added}</Tag>
-            <Tag color="error" style={{ borderRadius: 6, margin: 0 }}>删除 {summary.removed}</Tag>
-            <Tag color="warning" style={{ borderRadius: 6, margin: 0 }}>修改 {summary.changed}</Tag>
-            <span style={{ fontSize: 13, color: '#475569' }}>共 {summary.total} 处差异</span>
+            <DiffStatBar
+              items={[
+                { label: '新增', value: summary.added, tone: 'add' },
+                { label: '删除', value: summary.removed, tone: 'del' },
+                { label: '修改', value: summary.changed, tone: 'mod' },
+                { label: '共', value: summary.total, tone: 'info' },
+              ]}
+            />
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#475569' }}>
               数组按下标展开
               <Switch size="small" checked={expandArray} onChange={setExpandArray} />
@@ -157,7 +169,7 @@ export default function JsonDiffWorkspace() {
       >
         <div style={{ maxHeight: 520, overflow: 'auto' }}>
           {!textA.trim() || !textB.trim() ? (
-            <div style={{ color: '#94a3b8', fontSize: 13 }}>// 两侧都填入合法 JSON 后自动比对</div>
+            <DiffEmptyState text="// 两侧都填入合法 JSON 后自动比对" />
           ) : identical ? (
             <div style={{ color: '#10b981', fontSize: 13 }}>两个 JSON 完全一致，无任何差异。</div>
           ) : (
@@ -222,6 +234,20 @@ export default function JsonDiffWorkspace() {
           </div>
         )}
       </AccentCard>
+
+      <RecentComparisons
+        toolKey="json"
+        a={textA}
+        b={textB}
+        onRestore={(a, b) => { setTextA(a); setTextB(b); }}
+      />
+      <DiffNotesPanel
+        toolKey="json"
+        entries={changes.slice(0, 100).map((c, i) => ({
+          key: `json-${c.path}-${i}`,
+          label: `${c.kind} · ${c.path}`,
+        }))}
+      />
     </div>
   );
 }
